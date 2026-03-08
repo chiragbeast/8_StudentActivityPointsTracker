@@ -7,18 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# UI images folder
-ui images/
-
 node_modules
 dist
 dist-ssr
 *.local
-
-# Environment variables
-.env
-.env.*
-!.env.example
 
 # Editor directories and files
 .vscode/*

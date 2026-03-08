@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --amber: #f5a623;
+  --amber-dark: #e09510;
+  --cream: #fdf6ec;
+  --sidebar-bg: #141414;
+  --sidebar-text: #ffffff;
+  --text-dark: #1a1a2e;
+  --text-gray: #8a8fa8;
+  --border: #ede8e0;
+  --white: #ffffff;
+  --red: #e05252;
+  --blue: #4a90d9;
+  --blue-light: rgba(74, 144, 217, 0.08);
+  --pink: #E391C8;
+  --pink-light: rgba(227, 145, 200, 0.08);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text-dark);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+}

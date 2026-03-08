@@ -1,0 +1,449 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.breadcrumbLink:hover {
+  color: var(--amber);
+}
+
+.breadcrumbCurrent {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* ── Toast ── */
+.toast {
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease;
+}
+
+.approved {
+  background: #f0faf4;
+  color: #2d7a4f;
+  border: 1.5px solid #a8dfc0;
+}
+
+.rejected {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1.5px solid #f5b8b8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Layout ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Card ── */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.card:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Student Row ── */
+.studentRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.studentAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studentInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.studentName {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.4px;
+}
+
+.studentMeta {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+.pendingBadge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: #fff8ec;
+  color: var(--amber);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  width: fit-content;
+}
+
+.submittedOn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.submittedLabel {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.submittedDate {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ── Card Header ── */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cardIcon {
+  display: flex;
+  align-items: center;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ── Activity ── */
+.activityTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+
+.activityDesc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+
+.categoryBox {
+  background: #f8f8f8;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.categoryLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.categoryValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.departmentText {
+  color: var(--pink) !important;
+}
+
+.instituteText {
+  color: var(--blue) !important;
+}
+
+/* ── Proof Box ── */
+.proofBox {
+  border: 2px dashed #d8dde6;
+  border-radius: 12px;
+  background: #f4f6f9;
+  padding: 48px 24px;
+}
+
+.proofContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.pdfIcon {
+  margin-bottom: 6px;
+}
+
+.fileName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.reviewProofBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 24px;
+  background: #1a2535;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.reviewProofBtn:hover {
+  background: #2d3f55;
+  transform: translateY(-1px);
+}
+
+/* ── Right Panel ── */
+.evalTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
+}
+
+.evalSection {
+  margin-bottom: 18px;
+}
+
+.evalLabel {
+  display: block;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.requestedPoints {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.8px;
+}
+
+.pointsInputWrapper {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+  transition: border-color 0.15s;
+}
+
+.pointsInputWrapper:focus-within {
+  border-color: var(--amber);
+}
+
+.pointsDropdown {
+  flex: 1;
+  padding: 11px 14px;
+  border: none;
+  outline: none;
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  /* Remove default arrow for custom look if needed, but keeping for now */
+}
+
+/* For custom arrow if appearance: none is used */
+.pointsInputWrapper {
+  position: relative;
+}
+
+.pointsDropdown:focus {
+  background: #fff8ec;
+}
+
+.ptsSuffix {
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #bbb;
+  letter-spacing: 0.5px;
+  border-left: 1px solid #eee;
+}
+
+.feedbackTextarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text-dark);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  line-height: 1.5;
+}
+
+.feedbackTextarea::placeholder {
+  color: #bbb;
+}
+
+.feedbackTextarea:focus {
+  border-color: var(--amber);
+}
+
+/* ── Action Buttons ── */
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 24px 0 16px;
+}
+
+.approveBtn,
+.rejectBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 11px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.approveBtn {
+  background: var(--amber);
+  color: white;
+  border: none;
+}
+
+.approveBtn:hover:not(:disabled) {
+  background: var(--amber-dark);
+  transform: translateY(-1px);
+}
+
+.activatedApprove {
+  background: #2d7a4f !important;
+}
+
+.rejectBtn {
+  background: white;
+  color: #e05252;
+  border: 2px solid #e05252;
+}
+
+.rejectBtn:hover:not(:disabled) {
+  background: #fff5f5;
+  transform: translateY(-1px);
+}
+
+.activatedReject {
+  background: #e05252 !important;
+  color: white !important;
+}
+
+.approveBtn:disabled,
+.rejectBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Last Updated ── */
+.lastUpdated {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #bbb;
+  font-style: italic;
+}

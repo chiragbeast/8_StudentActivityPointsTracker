@@ -1,0 +1,315 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Page Header ── */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  font-size: 30px;
+  font-weight: 800;
+  color: #000;
+  letter-spacing: -0.6px;
+  line-height: 1.1;
+}
+
+.pageSubtitle {
+  font-size: 14px;
+  color: #999;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+.facultyCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.facultyInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.facultyName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.facultyRole {
+  font-size: 12px;
+  color: #999;
+}
+
+.facultyAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #e8ddd0;
+}
+
+.facultyAvatar svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* ── Search Group ── */
+.searchGroup {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  background: white;
+}
+
+.searchInput:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 4px var(--amber-light);
+}
+
+.searchBtn {
+  background: #FFB800;
+  /* Yellow */
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.searchBtn:hover {
+  background: #E6A600;
+  transform: translateY(-1px);
+}
+
+.searchBtn:active {
+  transform: translateY(0);
+}
+
+/* ── Table ── */
+.tableWrapper {
+  background: white;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead tr {
+  border-bottom: 2px solid var(--border);
+}
+
+.table thead tr th {
+  background: #000;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-align: left;
+  padding: 16px 24px;
+  white-space: nowrap;
+}
+
+.table body tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: #fdfaf5;
+}
+
+.table tbody tr td {
+  padding: 20px 24px;
+  font-size: 14px;
+  color: var(--text-dark);
+  vertical-align: middle;
+}
+
+.nameCell {
+  font-weight: 700;
+  color: var(--text-dark) !important;
+}
+
+.idCell {
+  color: #aaa !important;
+  font-size: 13px !important;
+}
+
+.institutePoints {
+  font-weight: 700;
+  font-size: 16px !important;
+  color: var(--pink) !important;
+}
+
+.deptPoints {
+  font-weight: 700;
+  font-size: 16px !important;
+  color: var(--blue) !important;
+}
+
+.totalBadge {
+  display: inline-block;
+  background: #f0f0f0;
+  color: var(--text-dark);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  min-width: 44px;
+  text-align: center;
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.mailBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid #eee;
+  background: white;
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mailBtn:hover {
+  background: #f8f8f8;
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--amber);
+  color: white;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 9px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.exportBtn:hover {
+  background: var(--amber-dark);
+  transform: translateY(-1px);
+}
+
+.exportBtn:active {
+  transform: translateY(0);
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.paginationInfo {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.paginationControls {
+  display: flex;
+  gap: 8px;
+}
+
+.pageBtn {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-dark);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  border-color: var(--amber);
+  background: var(--amber-light);
+  color: var(--amber);
+}
+
+.pageBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.table thead tr th:last-child,
+.table tbody tr td:last-child {
+  text-align: right;
+}
+
+.emptyState {
+  text-align: center !important;
+  color: #bbb !important;
+  font-size: 14px !important;
+  padding: 40px !important;
+}
