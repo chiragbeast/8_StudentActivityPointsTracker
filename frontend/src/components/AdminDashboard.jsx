@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import api from '../api'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const profileMenuRef = useRef(null)
+  const [stats, setStats] = useState({ totalStudents: 0, totalFaculty: 0, totalPendingSubmissions: 0 })
+  const [admins, setAdmins] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   // Close profile menu when clicking outside
   useEffect(() => {
@@ -18,38 +23,29 @@ export default function AdminDashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const admins = [
-    {
-      id: 1,
-      name: 'Marcus Wood',
-      email: 'm.wood@sapt.com',
-      role: 'Administrator',
-      roleColor: 'primary',
-      status: 'Active',
-      lastLogin: '5 mins ago',
-      avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbvbHPFVZubwKGmZmftqnUPsZZLgZ10ao8KO8teky2iNOWzsQ22s7oCIMTHs5zXjW7w55J09DMKHE8-IwYDDz4ms8M6MHkxqscTFYnQI4Om2mOV2oYkim1Ri9DIwDYlNXppUJ32PvybnoBtKZYoudC_b69RY0NYMsRZ_STdEY1olUag-0tdo2e1aHkSAVUADXWRHtA6srslzAqL3Z-CCYj40cR1ZwzNwvMAmDoecnLa_Q6qkWbDFKTo6YBdJP4Wz3291kbfkaIrRtB'
-    },
-    {
-      id: 2,
-      name: 'Alex Thompson',
-      email: 'alex.t@sapt.com',
-      role: 'Administrator',
-      roleColor: 'primary',
-      status: 'Active',
-      lastLogin: '1 hour ago',
-      avatar: 'https://i.pravatar.cc/150?img=12'
-    },
-    {
-      id: 3,
-      name: 'Jessica Park',
-      email: 'jessica.p@sapt.com',
-      role: 'Administrator',
-      roleColor: 'primary',
-      status: 'Active',
-      lastLogin: '3 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=45'
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const { data } = await api.get('/admin/dashboard')
+        setStats(data.stats)
+        setAdmins(data.admins)
+      } catch (err) {
+        setError('Failed to load dashboard data')
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+    fetchDashboard()
+  }, [])
+
+  function formatLastLogin(date) {
+    if (!date) return 'Never'
+    const diff = Math.floor((Date.now() - new Date(date)) / 1000)
+    if (diff < 60) return `${diff}s ago`
+    if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`
+    return `${Math.floor(diff / 86400)} days ago`
+  }
 
   return (
     <div className="h-screen overflow-hidden flex font-[Inter,sans-serif]" style={{backgroundColor: '#FFFBF2'}}>
@@ -216,29 +212,18 @@ export default function AdminDashboard() {
         {/* Dashboard Body */}
         <div>
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Card 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <div className="bg-white p-6 rounded-[24px] shadow-sm">
               <p className="text-gray-500 font-medium uppercase tracking-wider text-xs text-left">Total Students</p>
-              <h3 className="text-5xl font-bold text-[#15173D] mt-2">12,482</h3>
+              <h3 className="text-5xl font-bold text-[#15173D] mt-2">{loading ? '...' : stats.totalStudents}</h3>
             </div>
-
-            {/* Card 2 */}
             <div className="bg-white p-6 rounded-[24px] shadow-sm">
               <p className="text-gray-500 font-medium uppercase tracking-wider text-xs text-left">Total Faculties</p>
-              <h3 className="text-5xl font-bold text-[#15173D] mt-2">148</h3>
+              <h3 className="text-5xl font-bold text-[#15173D] mt-2">{loading ? '...' : stats.totalFaculty}</h3>
             </div>
-
-            {/* Card 3 */}
-            <div className="bg-white p-6 rounded-[24px] shadow-sm">
-              <p className="text-gray-500 font-medium uppercase tracking-wider text-xs text-left">Active Sessions</p>
-              <h3 className="text-5xl font-bold text-[#15173D] mt-2">1,204</h3>
-            </div>
-
-            {/* Card 4 */}
             <div className="bg-white p-6 rounded-[24px] shadow-sm">
               <p className="text-gray-500 font-medium uppercase tracking-wider text-xs text-left">Total Pending Submissions</p>
-              <h3 className="text-5xl font-bold text-[#15173D] mt-2">374</h3>
+              <h3 className="text-5xl font-bold text-[#15173D] mt-2">{loading ? '...' : stats.totalPendingSubmissions}</h3>
             </div>
           </div>
 
@@ -270,9 +255,15 @@ export default function AdminDashboard() {
               
               {/* Table Rows */}
               <div>
-                {admins.map((admin, index) => (
+                {loading ? (
+                  <div style={{padding: '32px', textAlign: 'center', color: '#6b7280'}}>Loading...</div>
+                ) : error ? (
+                  <div style={{padding: '32px', textAlign: 'center', color: '#ef4444'}}>{error}</div>
+                ) : admins.length === 0 ? (
+                  <div style={{padding: '32px', textAlign: 'center', color: '#6b7280'}}>No admins found.</div>
+                ) : admins.map((admin, index) => (
                   <div 
-                    key={admin.id} 
+                    key={admin._id} 
                     style={{
                       display: 'grid',
                       gridTemplateColumns: '2fr 1fr 1fr 1fr',
@@ -285,17 +276,21 @@ export default function AdminDashboard() {
                   >
                     {/* Admin Column with Avatar */}
                     <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                      <div 
-                        style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '50%',
-                          backgroundImage: `url('${admin.avatar}')`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          flexShrink: 0
-                        }}
-                      ></div>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #f5a623, #f7b731)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: '700',
+                        fontSize: '1rem',
+                        color: '#1a1a2e',
+                        flexShrink: 0
+                      }}>
+                        {admin.name?.charAt(0).toUpperCase()}
+                      </div>
                       <div>
                         <p style={{fontSize: '0.9rem', fontWeight: '600', color: '#1a1a2e', marginBottom: '2px'}}>{admin.name}</p>
                         <p style={{fontSize: '0.8rem', color: '#6b7280'}}>{admin.email}</p>
@@ -329,23 +324,23 @@ export default function AdminDashboard() {
                         borderRadius: '999px',
                         fontSize: '0.78rem',
                         fontWeight: '600',
-                        color: admin.status === 'Active' ? '#16a34a' : '#6b7280',
-                        border: admin.status === 'Active' ? '1.5px solid #bbf7d0' : '1.5px solid #e5e7eb',
-                        backgroundColor: admin.status === 'Active' ? '#f0fdf4' : '#f9fafb'
+                        color: admin.isActive ? '#16a34a' : '#6b7280',
+                        border: admin.isActive ? '1.5px solid #bbf7d0' : '1.5px solid #e5e7eb',
+                        backgroundColor: admin.isActive ? '#f0fdf4' : '#f9fafb'
                       }}>
                         <span style={{
                           width: '7px',
                           height: '7px',
                           borderRadius: '50%',
-                          backgroundColor: admin.status === 'Active' ? '#16a34a' : '#9ca3af'
+                          backgroundColor: admin.isActive ? '#16a34a' : '#9ca3af'
                         }}></span>
-                        {admin.status}
+                        {admin.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
                     
                     {/* Last Login Column */}
                     <div style={{textAlign: 'right', fontSize: '0.88rem', color: '#6b7280'}}>
-                      {admin.lastLogin}
+                      {formatLastLogin(admin.lastLogin)}
                     </div>
                   </div>
                 ))}

@@ -153,7 +153,7 @@ const AssignStudents = () => {
           </Link>
         </nav>
 
-        <div className="mt-auto" style={{position: 'relative'}}>
+        <div ref={profileMenuRef} className="mt-auto" style={{position: 'relative'}}>
           <div style={{height: '1px', background: 'rgba(255,255,255,0.1)', margin: '12px 8px 16px'}}></div>
           
           {/* Profile Popup Menu */}
@@ -232,8 +232,7 @@ const AssignStudents = () => {
             </div>
           )}
           
-          <div 
-            ref={profileMenuRef}
+          <div
             className="flex items-center gap-2.5 p-2 rounded-[10px] cursor-pointer hover:bg-white/[0.07] transition-colors"
             onClick={() => setShowProfileMenu(!showProfileMenu)}
           >
