@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../api';
 
 const AddFacultyAdvisor = () => {
   const [sendActivationEmail, setSendActivationEmail] = useState(true);
+  const [form, setForm] = useState({ name: '', email: '', department: '', phone: '', employeeId: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
@@ -18,9 +22,27 @@ const AddFacultyAdvisor = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleAddFaculty = () => {
-    console.log('Adding new faculty advisor...');
-    navigate('/faculty_advisor_management');
+  const handleAddFaculty = async () => {
+    setFormError('');
+    if (!form.name || !form.email) {
+      setFormError('Name and email are required.');
+      return;
+    }
+    try {
+      setSubmitting(true);
+      await api.post('/admin/faculty', {
+        name: form.name,
+        email: form.email,
+        department: form.department,
+        phone: form.phone,
+        employeeId: form.employeeId,
+      });
+      navigate('/faculty_advisor_management');
+    } catch (err) {
+      setFormError(err.response?.data?.message || 'Failed to add faculty advisor.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -204,6 +226,8 @@ const AddFacultyAdvisor = () => {
                       }}
                       placeholder="Dr. Sarah Williams" 
                       type="text"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
                       onFocus={(e) => e.target.style.borderColor = '#f5a623'}
                       onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
                     />
@@ -224,6 +248,8 @@ const AddFacultyAdvisor = () => {
                       }}
                       placeholder="FAC2024001" 
                       type="text"
+                      value={form.employeeId}
+                      onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
                       onFocus={(e) => e.target.style.borderColor = '#f5a623'}
                       onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
                     />
@@ -242,6 +268,8 @@ const AddFacultyAdvisor = () => {
                         borderColor: '#e5e1d8',
                         color: '#1a1a2e'
                       }}
+                      value={form.department}
+                      onChange={(e) => setForm({ ...form, department: e.target.value })}
                       onFocus={(e) => e.target.style.borderColor = '#f5a623'}
                       onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
                     >
@@ -275,6 +303,8 @@ const AddFacultyAdvisor = () => {
                       }}
                       placeholder="+91 98765 43210" 
                       type="tel"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       onFocus={(e) => e.target.style.borderColor = '#f5a623'}
                       onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
                     />
@@ -287,7 +317,7 @@ const AddFacultyAdvisor = () => {
                   <div className="relative group">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 transition-colors text-xl" style={{color: '#9ca3af'}}>mail</span>
                     <input 
-                      className="w-full border rounded-lg py-3.5 pl-12 pr-4 focus:outline-none focus:ring-2 transition-all" 
+                      className="w-full border rounded-lg py-3.5 pl-12 pr-4 focus:outline-none focus:ring-2 transition-all text-[#1a1a2e]" 
                       style={{
                         backgroundColor: '#fafaf8',
                         borderColor: '#e5e1d8',
@@ -295,6 +325,8 @@ const AddFacultyAdvisor = () => {
                       }}
                       placeholder="faculty@nitc.ac.in" 
                       type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
                       onFocus={(e) => e.target.style.borderColor = '#f5a623'}
                       onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
                     />
@@ -320,18 +352,26 @@ const AddFacultyAdvisor = () => {
               </div>
               
               {/* Actions */}
+              {formError && (
+                <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', fontSize: '0.85rem' }}>
+                  {formError}
+                </div>
+              )}
               <div className="flex items-center gap-4 pt-4">
                 <button 
                   type="button"
                   onClick={handleAddFaculty}
+                  disabled={submitting}
                   className="flex-1 text-white font-bold py-4 rounded-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                   style={{
                     background: 'linear-gradient(135deg, #f5a623 0%, #f7b731 100%)',
-                    boxShadow: '0 4px 15px rgba(245, 166, 35, 0.4)'
+                    boxShadow: '0 4px 15px rgba(245, 166, 35, 0.4)',
+                    opacity: submitting ? 0.7 : 1,
+                    cursor: submitting ? 'not-allowed' : 'pointer'
                   }}
                 >
                   <span className="material-symbols-outlined">person_add</span>
-                  Add Faculty Advisor
+                  {submitting ? 'Adding...' : 'Add Faculty Advisor'}
                 </button>
                 <button 
                   type="button"
@@ -345,9 +385,7 @@ const AddFacultyAdvisor = () => {
             </form>
           </div>
           
-          <footer className="mt-8 text-center text-xs" style={{color: '#6b7280'}}>
-            © 2024 SAPT Administration System • Secure Portal
-          </footer>
+
         </div>
       </main>
     </div>

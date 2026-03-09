@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../api';
 
 const FacultyAdvisorManagement = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
+  const [facultyList, setFacultyList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState('');
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -17,118 +21,28 @@ const FacultyAdvisorManagement = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const facultyAdvisors = [
-    {
-      id: 1,
-      name: 'Dr. Priya Sharma',
-      email: 'priya.sharma@nitc.ac.in',
-      department: 'Computer Science & Engineering',
-      avgPointsPerStudent: 1250,
-      assignedStudents: 24,
-      status: 'active',
-      lastActive: '1 hour ago',
-      avatar: 'https://i.pravatar.cc/150?img=10'
-    },
-    {
-      id: 2,
-      name: 'Prof. Rajesh Kumar',
-      email: 'rajesh.kumar@nitc.ac.in',
-      department: 'Electrical Engineering',
-      avgPointsPerStudent: 980,
-      assignedStudents: 18,
-      status: 'active',
-      lastActive: '30 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=15'
-    },
-    {
-      id: 3,
-      name: 'Dr. Anita Desai',
-      email: 'anita.desai@nitc.ac.in',
-      department: 'Mechanical Engineering',
-      avgPointsPerStudent: 1450,
-      assignedStudents: 21,
-      status: 'active',
-      lastActive: '2 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=20'
-    },
-    {
-      id: 4,
-      name: 'Dr. Vikram Singh',
-      email: 'vikram.singh@nitc.ac.in',
-      department: 'Civil Engineering',
-      avgPointsPerStudent: 875,
-      assignedStudents: 15,
-      status: 'on-leave',
-      lastActive: '3 days ago',
-      avatar: 'https://i.pravatar.cc/150?img=25'
-    },
-    {
-      id: 5,
-      name: 'Prof. Lakshmi Nair',
-      email: 'lakshmi.nair@nitc.ac.in',
-      department: 'Electronics & Communication',
-      avgPointsPerStudent: 1320,
-      assignedStudents: 22,
-      status: 'active',
-      lastActive: '45 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=30'
-    },
-    {
-      id: 6,
-      name: 'Dr. Arjun Reddy',
-      email: 'arjun.reddy@nitc.ac.in',
-      department: 'Chemical Engineering',
-      avgPointsPerStudent: 1180,
-      assignedStudents: 19,
-      status: 'active',
-      lastActive: '1 hour ago',
-      avatar: 'https://i.pravatar.cc/150?img=35'
-    },
-    {
-      id: 7,
-      name: 'Prof. Meera Patel',
-      email: 'meera.patel@nitc.ac.in',
-      department: 'Biotechnology',
-      avgPointsPerStudent: 1090,
-      assignedStudents: 17,
-      status: 'active',
-      lastActive: '3 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=40'
-    },
-    {
-      id: 8,
-      name: 'Dr. Sanjay Gupta',
-      email: 'sanjay.gupta@nitc.ac.in',
-      department: 'Materials Science & Engineering',
-      avgPointsPerStudent: 1385,
-      assignedStudents: 20,
-      status: 'active',
-      lastActive: '20 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=45'
-    },
-    {
-      id: 9,
-      name: 'Prof. Kavita Malhotra',
-      email: 'kavita.malhotra@nitc.ac.in',
-      department: 'Production Engineering',
-      avgPointsPerStudent: 1510,
-      assignedStudents: 23,
-      status: 'active',
-      lastActive: '15 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=50'
-    },
-    {
-      id: 10,
-      name: 'Dr. Ramesh Iyer',
-      email: 'ramesh.iyer@nitc.ac.in',
-      department: 'Engineering Physics',
-      avgPointsPerStudent: 1205,
-      assignedStudents: 16,
-      status: 'active',
-      lastActive: '40 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=55'
-    }
-  ];
+  useEffect(() => {
+    const fetchFaculty = async () => {
+      try {
+        const { data } = await api.get('/admin/faculty');
+        setFacultyList(data);
+      } catch (err) {
+        setFetchError('Failed to load faculty data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFaculty();
+  }, []);
+
+  const filteredFaculty = facultyList.filter(f => {
+    const q = searchQuery.toLowerCase();
+    return (
+      f.name.toLowerCase().includes(q) ||
+      f.email.toLowerCase().includes(q) ||
+      (f.department || '').toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="h-screen overflow-hidden flex font-[Inter,sans-serif]" style={{backgroundColor: '#FFFBF2'}}>
@@ -315,7 +229,7 @@ const FacultyAdvisorManagement = () => {
           <div className="rounded-[24px] shadow-sm overflow-hidden bg-white">
             <div className="p-8">
               <div className="flex items-center justify-between mb-8">
-                <h4 className="text-2xl font-bold text-[#111827]">Faculty Advisors</h4>
+                <h4 className="text-2xl font-bold text-[#111827]">Faculty Advisors ({loading ? '…' : filteredFaculty.length})</h4>
               </div>
               <div className="overflow-hidden rounded-[10px]">
                 <table className="w-full text-left">
@@ -330,14 +244,19 @@ const FacultyAdvisorManagement = () => {
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {facultyAdvisors.map((faculty) => (
-                      <tr key={faculty.id} className="border-b last:border-0" style={{borderColor: '#f3f4f6'}}>
+                    {loading ? (
+                      <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-400">Loading faculty data...</td></tr>
+                    ) : fetchError ? (
+                      <tr><td colSpan={6} className="py-8 text-center text-sm text-red-500">{fetchError}</td></tr>
+                    ) : filteredFaculty.length === 0 ? (
+                      <tr><td colSpan={6} className="py-8 text-center text-sm text-gray-400">No faculty members found.</td></tr>
+                    ) : filteredFaculty.map((faculty) => (
+                      <tr key={faculty._id} className="border-b last:border-0" style={{borderColor: '#f3f4f6'}}>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div 
-                              className="w-10 h-10 rounded-full bg-center bg-cover"
-                              style={{backgroundImage: `url('${faculty.avatar}')`}}
-                            ></div>
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style={{background: 'linear-gradient(135deg, #f5a623, #f7b731)', color: '#1a1a2e'}}>
+                              {faculty.name ? faculty.name.charAt(0).toUpperCase() : '?'}
+                            </div>
                             <div>
                               <p className="text-sm font-bold text-[#111827]">{faculty.name}</p>
                               <p className="text-xs text-gray-400">{faculty.email}</p>
@@ -345,26 +264,38 @@ const FacultyAdvisorManagement = () => {
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="text-sm font-medium text-gray-700">{faculty.department}</span>
+                          <span className="text-sm font-medium text-gray-700">{faculty.department ? faculty.department.toUpperCase() : '—'}</span>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="text-lg font-bold text-[#111827]">{faculty.assignedStudents}</span>
+                          <span className="text-lg font-bold text-[#111827]">{faculty.assignedStudents ?? 0}</span>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="text-lg font-bold text-[#111827]">{faculty.avgPointsPerStudent}</span>
+                          <span className="text-lg font-bold text-[#111827]">—</span>
                         </td>
                         <td className="py-4 px-6">
-                          <div className={`flex items-center gap-2 ${faculty.status === 'on-leave' ? 'opacity-50' : ''}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${faculty.status === 'active' ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                            <span className="text-sm text-gray-700">
-                              {faculty.status === 'active' ? 'Active' : 'On Leave'}
-                            </span>
-                          </div>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '5px 14px',
+                            borderRadius: '999px',
+                            fontSize: '0.78rem',
+                            fontWeight: '600',
+                            color: faculty.isActive ? '#16a34a' : '#6b7280',
+                            border: faculty.isActive ? '1.5px solid #bbf7d0' : '1.5px solid #e5e7eb',
+                            backgroundColor: faculty.isActive ? '#f0fdf4' : '#f9fafb'
+                          }}>
+                            <span style={{
+                              width: '7px', height: '7px', borderRadius: '50%',
+                              backgroundColor: faculty.isActive ? '#16a34a' : '#9ca3af'
+                            }}></span>
+                            {faculty.isActive ? 'Active' : 'On Leave'}
+                          </span>
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Link 
-                              to={`/edit_faculty/${faculty.id}`}
+                              to={`/edit_faculty/${faculty._id}`}
                               className="inline-block p-1.5 hover:opacity-70 transition-colors" 
                               style={{color: '#F4AD39'}}
                               title="Edit Faculty"
@@ -374,7 +305,7 @@ const FacultyAdvisorManagement = () => {
                               </svg>
                             </Link>
                             <Link 
-                              to={`/assign_students/${faculty.id}`}
+                              to={`/assign_students/${faculty._id}`}
                               className="inline-block p-1.5 hover:opacity-70 transition-colors" 
                               style={{color: '#F4AD39'}}
                               title="Assign Students"

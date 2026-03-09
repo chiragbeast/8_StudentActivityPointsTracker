@@ -147,4 +147,115 @@ const deleteStudent = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Student deleted successfully' });
 });
 
-module.exports = { getDashboard, getStudents, createStudent, getStudentById, updateStudent, deleteStudent };
+// @desc    Get all faculty members with assigned student count
+// @route   GET /api/admin/faculty
+// @access  Private/Admin
+const getFaculty = asyncHandler(async (req, res) => {
+    const faculty = await User.aggregate([
+        { $match: { role: 'Faculty' } },
+        {
+            $lookup: {
+                from: 'users',
+                let: { facultyId: '$_id' },
+                pipeline: [
+                    { $match: { $expr: { $and: [
+                        { $eq: ['$role', 'Student'] },
+                        { $eq: ['$facultyAdvisor', '$$facultyId'] }
+                    ]}}}
+                ],
+                as: 'assignedStudentsList',
+            },
+        },
+        { $addFields: { assignedStudents: { $size: '$assignedStudentsList' } } },
+        {
+            $project: {
+                name: 1, email: 1, department: 1, phone: 1, rollNumber: 1,
+                isActive: 1, lastLogin: 1, createdAt: 1, assignedStudents: 1,
+            },
+        },
+        { $sort: { createdAt: -1 } },
+    ]);
+    res.status(200).json(faculty);
+});
+
+// @desc    Create a new faculty user
+// @route   POST /api/admin/faculty
+// @access  Private/Admin
+const createFaculty = asyncHandler(async (req, res) => {
+    const { name, email, department, phone, employeeId } = req.body;
+    if (!name || !email) {
+        res.status(400);
+        throw new Error('Name and email are required');
+    }
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+        res.status(400);
+        throw new Error('A user with this email already exists');
+    }
+    const tempPassword = 'Temp@' + Math.random().toString(36).slice(-8);
+    const faculty = await User.create({
+        name,
+        email,
+        password: tempPassword,
+        role: 'Faculty',
+        department: department || undefined,
+        phone: phone || undefined,
+        rollNumber: employeeId || undefined,
+    });
+    res.status(201).json({
+        _id: faculty._id,
+        name: faculty.name,
+        email: faculty.email,
+        department: faculty.department,
+        isActive: faculty.isActive,
+        assignedStudents: 0,
+    });
+});
+
+// @desc    Get single faculty by ID
+// @route   GET /api/admin/faculty/:id
+// @access  Private/Admin
+const getFacultyById = asyncHandler(async (req, res) => {
+    const faculty = await User.findOne({ _id: req.params.id, role: 'Faculty' }).select('-password');
+    if (!faculty) {
+        res.status(404);
+        throw new Error('Faculty member not found');
+    }
+    res.status(200).json(faculty);
+});
+
+// @desc    Update faculty by ID
+// @route   PUT /api/admin/faculty/:id
+// @access  Private/Admin
+const updateFaculty = asyncHandler(async (req, res) => {
+    const faculty = await User.findOne({ _id: req.params.id, role: 'Faculty' });
+    if (!faculty) {
+        res.status(404);
+        throw new Error('Faculty member not found');
+    }
+    const { name, email, department, phone, isActive } = req.body;
+    if (name) faculty.name = name;
+    if (email) faculty.email = email.toLowerCase();
+    if (department !== undefined) faculty.department = department;
+    if (phone !== undefined) faculty.phone = phone;
+    if (typeof isActive === 'boolean') faculty.isActive = isActive;
+    await faculty.save();
+    res.status(200).json({ message: 'Faculty updated successfully' });
+});
+
+// @desc    Delete faculty by ID
+// @route   DELETE /api/admin/faculty/:id
+// @access  Private/Admin
+const deleteFaculty = asyncHandler(async (req, res) => {
+    const faculty = await User.findOne({ _id: req.params.id, role: 'Faculty' });
+    if (!faculty) {
+        res.status(404);
+        throw new Error('Faculty member not found');
+    }
+    // Remove this faculty as advisor from all their students
+    await User.updateMany({ facultyAdvisor: req.params.id }, { $set: { facultyAdvisor: null } });
+    await User.deleteOne({ _id: req.params.id });
+    res.status(200).json({ message: 'Faculty deleted successfully' });
+});
+
+module.exports = { getDashboard, getStudents, createStudent, getStudentById, updateStudent, deleteStudent, getFaculty, createFaculty, getFacultyById, updateFaculty, deleteFaculty };

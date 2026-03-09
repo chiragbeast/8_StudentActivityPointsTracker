@@ -333,19 +333,8 @@ const EditStudent = () => {
           </form>
         </div>
 
-        {/* System Meta Info */}
-        <div className="mt-6 flex justify-center gap-8 text-[11px] uppercase tracking-[2px] font-bold" style={{color: '#9ca3af'}}>
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></div>
-            System Operational
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[12px]">lock</span>
-            Secure SAPT Access
-          </div>
-        </div>
       </main>
-      )} {/* end loading conditional */}
+      )} {/* end loading conditional */
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

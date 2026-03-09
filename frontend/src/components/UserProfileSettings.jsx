@@ -38,228 +38,113 @@ const UserProfileSettings = () => {
   }
 
   return (
-    <div style={{display: 'flex', minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'}}>
-      {/* Black Sidebar */}
-      <aside style={{
-        width: '260px',
-        backgroundColor: '#000000',
-        color: '#fff',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        flexShrink: 0
-      }}>
-        {/* Logo/Branding */}
-        <div style={{padding: '28px 24px 20px'}}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #f5a623, #d68910)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '800',
-              fontSize: '1.2rem',
-              color: '#1a1a2e'
-            }}>S</div>
-            <div>
-              <h1 style={{fontSize: '1.1rem', fontWeight: '700', margin: 0, letterSpacing: '-0.3px'}}>SAPT Portal</h1>
-              <p style={{fontSize: '0.7rem', color: '#888', margin: 0, marginTop: '2px'}}>Admin Dashboard</p>
-            </div>
-          </div>
+    <div className="h-screen overflow-hidden flex font-display" style={{backgroundColor: '#FFFBF2'}}>
+      {/* Sidebar */}
+      <aside className="w-[260px] flex flex-col shrink-0 h-screen sticky top-0 px-4 pt-7 pb-5" style={{backgroundColor: '#000000', color: '#FFFFFF'}}>
+        <div className="px-2 mb-9 flex items-center gap-2.5">
+          <span className="text-white text-[1.2rem] font-bold tracking-[0.3px]" style={{fontFamily: 'Poppins, sans-serif'}}>SAPT</span>
         </div>
 
-        {/* Navigation Links */}
-        <nav style={{flex: 1, padding: '12px 20px'}}>
-          <Link 
+        <nav className="flex-1 flex flex-col gap-1">
+          <Link
             to="/admin_dashboard"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              color: '#aaa',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              marginBottom: '6px'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1a1a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <span style={{fontSize: '1.3rem'}}>📊</span>
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" strokeLinecap="round" strokeLinejoin="round"></path>
+            </svg>
             <span>Dashboard</span>
           </Link>
-          
-          <Link 
-            to="/admin-user-management"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              color: '#aaa',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              marginBottom: '6px'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1a1a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          <Link
+            to="/admin_student_management"
+            className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <span style={{fontSize: '1.3rem'}}>👥</span>
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round"></path>
+            </svg>
             <span>Students</span>
           </Link>
-          
-          <Link 
-            to="/faculty-management"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              color: '#aaa',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              marginBottom: '6px'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1a1a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          <Link
+            to="/faculty_advisor_management"
+            className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <span style={{fontSize: '1.3rem'}}>🎓</span>
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M12 14l9-5-9-5-9 5 9 5z" strokeLinecap="round" strokeLinejoin="round"></path>
+              <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" strokeLinecap="round" strokeLinejoin="round"></path>
+              <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" strokeLinecap="round" strokeLinejoin="round"></path>
+            </svg>
             <span>Faculty Members</span>
           </Link>
-          
-          <Link 
-            to="/reports"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              color: '#aaa',
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              marginBottom: '6px'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1a1a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          <Link
+            to="/reports_analytics"
+            className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <span style={{fontSize: '1.3rem'}}>📈</span>
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round"></path>
+            </svg>
             <span>Reports</span>
           </Link>
         </nav>
 
-        {/* Profile Popup Menu at Bottom */}
-        <div style={{padding: '16px 20px', borderTop: '1px solid #1a1a1a'}}>
-          <div 
-            ref={profileMenuRef}
-            style={{position: 'relative'}}
-          >
-            <div 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                backgroundColor: showProfileMenu ? '#1a1a1a' : 'transparent'
-              }}
-              onMouseEnter={(e) => {if (!showProfileMenu) e.currentTarget.style.backgroundColor = '#1a1a1a'}}
-              onMouseLeave={(e) => {if (!showProfileMenu) e.currentTarget.style.backgroundColor = 'transparent'}}
-            >
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #fdf8f0, #f5e6c8)',
-                border: '2px solid #f5a623',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: '700',
-                fontSize: '1rem',
-                color: '#1a1a2e',
-                flexShrink: 0
-              }}>A</div>
-              <div style={{flex: 1, minWidth: 0}}>
-                <p style={{fontSize: '0.85rem', fontWeight: '600', margin: 0, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>Administrator</p>
-                <p style={{fontSize: '0.7rem', color: '#888', margin: 0}}>Admin</p>
-              </div>
-              <span style={{fontSize: '1.2rem', color: '#888'}}>⋮</span>
+        <div ref={profileMenuRef} className="mt-auto" style={{position: 'relative'}}>
+          <div style={{height: '1px', background: 'rgba(255,255,255,0.1)', margin: '12px 8px 16px'}}></div>
+
+          {showProfileMenu && (
+            <div style={{
+              position: 'absolute',
+              bottom: '70px',
+              left: '8px',
+              right: '8px',
+              backgroundColor: '#000000',
+              borderRadius: '12px',
+              padding: '8px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+              zIndex: 50
+            }}>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); navigate('/profile_settings'); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '10px 12px', backgroundColor: 'transparent', border: 'none',
+                  borderRadius: '8px', color: '#e5e7eb', fontSize: '0.88rem', fontWeight: '500',
+                  cursor: 'pointer', transition: 'background-color 0.2s', fontFamily: 'inherit'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"></path>
+                </svg>
+                View Profile
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowProfileMenu(false); localStorage.clear(); navigate('/login'); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '10px 12px', backgroundColor: 'transparent', border: 'none',
+                  borderRadius: '8px', color: '#ef4444', fontSize: '0.88rem', fontWeight: '500',
+                  cursor: 'pointer', transition: 'background-color 0.2s', fontFamily: 'inherit'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"></path>
+                </svg>
+                Logout
+              </button>
             </div>
-            
-            {showProfileMenu && (
-              <div style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: 0,
-                right: 0,
-                marginBottom: '8px',
-                backgroundColor: '#1a1a1a',
-                borderRadius: '10px',
-                padding: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                zIndex: 1000
-              }}>
-                <Link 
-                  to="/profile"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    color: '#ddd',
-                    textDecoration: 'none',
-                    fontSize: '0.85rem',
-                    transition: 'background-color 0.2s',
-                    marginBottom: '4px'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#252525'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  <span style={{fontSize: '1.1rem'}}>👤</span>
-                  <span>Profile Settings</span>
-                </Link>
-                <Link 
-                  to="/login"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    color: '#f87171',
-                    textDecoration: 'none',
-                    fontSize: '0.85rem',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#252525'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  <span style={{fontSize: '1.1rem'}}>🚪</span>
-                  <span>Logout</span>
-                </Link>
-              </div>
-            )}
+          )}
+
+          <div
+            className="flex items-center gap-2.5 p-2 rounded-[10px] cursor-pointer hover:bg-white/[0.07] transition-colors"
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+          >
+            <div className="w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-[0.95rem]" style={{background: 'linear-gradient(135deg, #f5a623, #f7b731)', color: '#1a1a2e'}}>A</div>
+            <div className="flex flex-col">
+              <span className="text-[0.9rem] font-semibold text-white">Admin User</span>
+              <span className="text-[0.78rem] text-[#9ca3af]">(Super Admin)</span>
+            </div>
           </div>
         </div>
       </aside>

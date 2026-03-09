@@ -367,9 +367,7 @@ const AddNewStudentUser = () => {
             </form>
           </div>
           
-          <footer className="mt-8 text-center text-xs" style={{color: '#6b7280'}}>
-            © 2024 SAPT Administration System • Secure Portal
-          </footer>
+
         </div>
       </main>
     </div>
