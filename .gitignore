@@ -33,3 +33,7 @@ dist-ssr
 
 .env
 *.env
+
+# Session notes
+conversation_history.md
+gitcommands.md

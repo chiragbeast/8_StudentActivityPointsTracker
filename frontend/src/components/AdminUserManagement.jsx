@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../api';
 
 const AdminUserManagement = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -17,108 +21,28 @@ const AdminUserManagement = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const students = [
-    {
-      id: 1,
-      name: 'Alexander Wright',
-      email: 'a.wright@sapt.com',
-      totalPoints: 1450,
-      department: 'Computer Science & Engineering',
-      status: 'active',
-      lastActive: '2 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      id: 2,
-      name: 'Sarah Jenkins',
-      email: 's.jenkins@sapt.com',
-      totalPoints: 1120,
-      department: 'Electronics & Communication',
-      status: 'active',
-      lastActive: '5 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=5'
-    },
-    {
-      id: 3,
-      name: 'Marcus Thorne',
-      email: 'm.thorne@sapt.com',
-      totalPoints: 980,
-      department: 'Mechanical Engineering',
-      status: 'active',
-      lastActive: 'Yesterday',
-      avatar: 'https://i.pravatar.cc/150?img=12'
-    },
-    {
-      id: 4,
-      name: 'Elena Rodriguez',
-      email: 'e.rod@sapt.com',
-      totalPoints: 750,
-      department: 'Civil Engineering',
-      status: 'deactivated',
-      lastActive: '2 weeks ago',
-      avatar: null
-    },
-    {
-      id: 5,
-      name: 'David Kim',
-      email: 'd.kim@sapt.com',
-      totalPoints: 1350,
-      department: 'Electrical & Electronics',
-      status: 'active',
-      lastActive: '3 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=33'
-    },
-    {
-      id: 6,
-      name: 'Priya Sharma',
-      email: 'p.sharma@sapt.com',
-      totalPoints: 1580,
-      department: 'Computer Science & Engineering',
-      status: 'active',
-      lastActive: '1 hour ago',
-      avatar: 'https://i.pravatar.cc/150?img=25'
-    },
-    {
-      id: 7,
-      name: 'James Wilson',
-      email: 'j.wilson@sapt.com',
-      totalPoints: 890,
-      department: 'Chemical Engineering',
-      status: 'active',
-      lastActive: '4 hours ago',
-      avatar: 'https://i.pravatar.cc/150?img=15'
-    },
-    {
-      id: 8,
-      name: 'Aisha Patel',
-      email: 'a.patel@sapt.com',
-      totalPoints: 1240,
-      department: 'Biotechnology',
-      status: 'pending',
-      lastActive: '2 days ago',
-      avatar: 'https://i.pravatar.cc/150?img=45'
-    },
-    {
-      id: 9,
-      name: 'Ryan Cooper',
-      email: 'r.cooper@sapt.com',
-      totalPoints: 1095,
-      department: 'Materials Science & Engineering',
-      status: 'active',
-      lastActive: '30 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=52'
-    },
-    {
-      id: 10,
-      name: 'Lakshmi Nair',
-      email: 'l.nair@sapt.com',
-      totalPoints: 1670,
-      department: 'Production Engineering',
-      status: 'active',
-      lastActive: '15 mins ago',
-      avatar: 'https://i.pravatar.cc/150?img=38'
-    }
-  ];
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const { data } = await api.get('/admin/students');
+        setStudents(data);
+      } catch (err) {
+        setError('Failed to load students');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStudents();
+  }, []);
+
+  const filteredStudents = students.filter((s) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      s.name?.toLowerCase().includes(q) ||
+      s.email?.toLowerCase().includes(q) ||
+      s.department?.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="h-screen overflow-hidden flex font-[Inter,sans-serif]" style={{backgroundColor: '#FFFBF2'}}>
@@ -270,7 +194,7 @@ const AdminUserManagement = () => {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-bold text-[#111827]">Student Management</h1>
-            <p className="text-gray-500 mt-1">Manage access and assignments for 1,248 active students.</p>
+            <p className="text-gray-500 mt-1">Manage access and assignments for {loading ? '...' : `${students.length} active`} students.</p>
           </div>
           <div className="flex items-center gap-6">
             <Link 
@@ -319,14 +243,22 @@ const AdminUserManagement = () => {
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {students.map((student) => (
-                      <tr key={student.id} className="border-b last:border-0" style={{borderColor: '#f3f4f6'}}>
+                    {loading ? (
+                      <tr><td colSpan={5} className="py-10 text-center text-gray-400">Loading...</td></tr>
+                    ) : error ? (
+                      <tr><td colSpan={5} className="py-10 text-center text-red-400">{error}</td></tr>
+                    ) : filteredStudents.length === 0 ? (
+                      <tr><td colSpan={5} className="py-10 text-center text-gray-400">No students found.</td></tr>
+                    ) : filteredStudents.map((student) => (
+                      <tr key={student._id} className="border-b last:border-0" style={{borderColor: '#f3f4f6'}}>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div 
-                              className="w-10 h-10 rounded-full bg-center bg-cover"
-                              style={{backgroundImage: student.avatar ? `url('${student.avatar}')` : 'none', backgroundColor: student.avatar ? 'transparent' : '#ddd'}}
-                            ></div>
+                            <div
+                              className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                              style={{background: 'linear-gradient(135deg, #f5a623, #f7b731)', color: '#1a1a2e'}}
+                            >
+                              {student.name?.charAt(0).toUpperCase()}
+                            </div>
                             <div>
                               <p className="text-sm font-bold text-[#111827]">{student.name}</p>
                               <p className="text-xs text-gray-400">{student.email}</p>
@@ -334,11 +266,11 @@ const AdminUserManagement = () => {
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="text-lg font-bold text-[#111827]">{student.totalPoints}</span>
+                          <span className="text-lg font-bold text-[#111827]">{student.totalPoints ?? 0}</span>
                           <span className="text-xs ml-1 text-gray-500">pts</span>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="text-sm font-medium text-gray-700">{student.department}</span>
+                          <span className="text-sm font-medium text-gray-700">{student.department ? student.department.toUpperCase() : '—'}</span>
                         </td>
                         <td className="py-4 px-6">
                           <span style={{
@@ -349,22 +281,22 @@ const AdminUserManagement = () => {
                             borderRadius: '999px',
                             fontSize: '0.78rem',
                             fontWeight: '600',
-                            color: student.status === 'active' ? '#16a34a' : '#6b7280',
-                            border: student.status === 'active' ? '1.5px solid #bbf7d0' : '1.5px solid #e5e7eb',
-                            backgroundColor: student.status === 'active' ? '#f0fdf4' : '#f9fafb'
+                            color: student.isActive ? '#16a34a' : '#6b7280',
+                            border: student.isActive ? '1.5px solid #bbf7d0' : '1.5px solid #e5e7eb',
+                            backgroundColor: student.isActive ? '#f0fdf4' : '#f9fafb'
                           }}>
                             <span style={{
                               width: '7px', height: '7px', borderRadius: '50%',
-                              backgroundColor: student.status === 'active' ? '#16a34a' : '#9ca3af'
+                              backgroundColor: student.isActive ? '#16a34a' : '#9ca3af'
                             }}></span>
-                            {student.status === 'active' ? 'Active' : 'Inactive'}
+                            {student.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
-                              onClick={() => console.log('Download transcript for student:', student.id)}
-                              className="inline-block p-1.5 hover:opacity-70 transition-colors" 
+                              onClick={() => console.log('Download transcript for student:', student._id)}
+                              className="inline-block p-1.5 hover:opacity-70 transition-colors"
                               style={{color: '#F4AD39'}}
                               title="Download Transcript"
                             >
@@ -372,9 +304,9 @@ const AdminUserManagement = () => {
                                 <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
                               </svg>
                             </button>
-                            <Link 
-                              to={`/edit_student/${student.id}`}
-                              className="inline-block p-1.5 hover:opacity-70 transition-colors" 
+                            <Link
+                              to={`/edit_student/${student._id}`}
+                              className="inline-block p-1.5 hover:opacity-70 transition-colors"
                               style={{color: '#F4AD39'}}
                               title="Edit Student"
                             >

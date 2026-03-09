@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Submission = require('../models/Submission');
+const ActivityPoints = require('../models/ActivityPoints');
 
 // @desc    Get admin dashboard stats and admin user list
 // @route   GET /api/admin/dashboard
@@ -25,4 +26,125 @@ const getDashboard = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { getDashboard };
+// @desc    Get all students with total points
+// @route   GET /api/admin/students
+// @access  Private/Admin
+const getStudents = asyncHandler(async (req, res) => {
+    const students = await User.aggregate([
+        { $match: { role: 'Student' } },
+        {
+            $lookup: {
+                from: 'activitypoints',
+                localField: '_id',
+                foreignField: 'student',
+                as: 'points',
+            },
+        },
+        {
+            $addFields: {
+                totalPoints: { $ifNull: [{ $arrayElemAt: ['$points.totalPoints', 0] }, 0] },
+            },
+        },
+        {
+            $project: {
+                name: 1, email: 1, rollNumber: 1, department: 1,
+                isActive: 1, lastLogin: 1, createdAt: 1, totalPoints: 1,
+            },
+        },
+        { $sort: { createdAt: -1 } },
+    ]);
+    res.status(200).json(students);
+});
+
+// @desc    Create a new student user
+// @route   POST /api/admin/students
+// @access  Private/Admin
+const createStudent = asyncHandler(async (req, res) => {
+    const { name, email, rollNumber, department, phone } = req.body;
+
+    if (!name || !email) {
+        res.status(400);
+        throw new Error('Name and email are required');
+    }
+
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+        res.status(400);
+        throw new Error('A user with this email already exists');
+    }
+
+    const tempPassword = 'Temp@' + Math.random().toString(36).slice(-8);
+
+    const student = await User.create({
+        name,
+        email,
+        password: tempPassword,
+        role: 'Student',
+        rollNumber: rollNumber || undefined,
+        department: department || undefined,
+        phone: phone || undefined,
+    });
+
+    res.status(201).json({
+        _id: student._id,
+        name: student.name,
+        email: student.email,
+        rollNumber: student.rollNumber,
+        department: student.department,
+        isActive: student.isActive,
+        totalPoints: 0,
+    });
+});
+
+// @desc    Get single student by ID (with faculty list for dropdown)
+// @route   GET /api/admin/students/:id
+// @access  Private/Admin
+const getStudentById = asyncHandler(async (req, res) => {
+    const student = await User.findOne({ _id: req.params.id, role: 'Student' })
+        .select('-password')
+        .populate('facultyAdvisor', 'name department');
+    if (!student) {
+        res.status(404);
+        throw new Error('Student not found');
+    }
+    const facultyList = await User.find({ role: 'Faculty' })
+        .select('name department')
+        .sort({ name: 1 });
+    res.status(200).json({ student, facultyList });
+});
+
+// @desc    Update student by ID
+// @route   PUT /api/admin/students/:id
+// @access  Private/Admin
+const updateStudent = asyncHandler(async (req, res) => {
+    const student = await User.findOne({ _id: req.params.id, role: 'Student' });
+    if (!student) {
+        res.status(404);
+        throw new Error('Student not found');
+    }
+    const { name, rollNumber, department, phone, isActive, facultyAdvisorId } = req.body;
+    if (name) student.name = name;
+    if (rollNumber !== undefined) student.rollNumber = rollNumber;
+    if (department !== undefined) student.department = department;
+    if (phone !== undefined) student.phone = phone;
+    if (typeof isActive === 'boolean') student.isActive = isActive;
+    if (facultyAdvisorId !== undefined) student.facultyAdvisor = facultyAdvisorId || null;
+    await student.save();
+    res.status(200).json({ message: 'Student updated successfully' });
+});
+
+// @desc    Delete student by ID
+// @route   DELETE /api/admin/students/:id
+// @access  Private/Admin
+const deleteStudent = asyncHandler(async (req, res) => {
+    const student = await User.findOne({ _id: req.params.id, role: 'Student' });
+    if (!student) {
+        res.status(404);
+        throw new Error('Student not found');
+    }
+    await User.deleteOne({ _id: req.params.id });
+    await ActivityPoints.deleteMany({ student: req.params.id });
+    res.status(200).json({ message: 'Student deleted successfully' });
+});
+
+module.exports = { getDashboard, getStudents, createStudent, getStudentById, updateStudent, deleteStudent };
