@@ -1,12 +1,43 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import "./Auth.css";
 
 const ROLES = ["Student", "Faculty", "Admin"];
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [activeRole, setActiveRole] = useState("Student");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      navigate('/dashboard'); // or wherever after login
+    }
+  }, [searchParams, navigate]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+      localStorage.setItem('token', res.data.token);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed');
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:5000/api/auth/google';
+  };
 
   return (
     <div className="auth-container">
@@ -33,10 +64,33 @@ export default function LoginPage() {
           ))}
         </div>
 
-        <input className="auth-input" placeholder="ID / Email" />
-        <input className="auth-input" type="password" placeholder="Password" />
+        <form onSubmit={handleLogin}>
+          <input
+            className="auth-input"
+            name="email"
+            placeholder="ID / Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="auth-input"
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
 
-        <button className="auth-btn">Login</button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
+          <button className="auth-btn" type="submit">Login</button>
+        </form>
+
+        <button className="auth-btn" onClick={handleGoogleLogin} style={{ background: '#4285F4', marginTop: '10px' }}>
+          Sign in with Google
+        </button>
 
         <div className="auth-link">
           <a onClick={() => navigate("/forgot-password")}>
