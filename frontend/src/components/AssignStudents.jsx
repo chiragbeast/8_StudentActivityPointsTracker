@@ -1,204 +1,269 @@
-import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import api from '../api';
+import { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import api from '../api'
 
 const AssignStudents = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const profileMenuRef = useRef(null);
-  const [unassignedSearchQuery, setUnassignedSearchQuery] = useState('');
-  const [assignedSearchQuery, setAssignedSearchQuery] = useState('');
-  const [selectedUnassigned, setSelectedUnassigned] = useState([]);
-  const [selectedAssigned, setSelectedAssigned] = useState([]);
+  const navigate = useNavigate()
+  const { id } = useParams()
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const profileMenuRef = useRef(null)
+  const [unassignedSearchQuery, setUnassignedSearchQuery] = useState('')
+  const [assignedSearchQuery, setAssignedSearchQuery] = useState('')
+  const [selectedUnassigned, setSelectedUnassigned] = useState([])
+  const [selectedAssigned, setSelectedAssigned] = useState([])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
-        setShowProfileMenu(false);
+        setShowProfileMenu(false)
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
-  const [faculty, setFaculty] = useState(null);
-  const [unassignedStudents, setUnassignedStudents] = useState([]);
-  const [assignedStudents, setAssignedStudents] = useState([]);
-  const [originalAssignedIds, setOriginalAssignedIds] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [faculty, setFaculty] = useState(null)
+  const [unassignedStudents, setUnassignedStudents] = useState([])
+  const [assignedStudents, setAssignedStudents] = useState([])
+  const [originalAssignedIds, setOriginalAssignedIds] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState('')
+  const [saving, setSaving] = useState(false)
 
   const deptAbbr = (dept) => {
-    if (!dept) return '';
+    if (!dept) return ''
     const map = {
-      'computer science': 'CSE', 'computer science and engineering': 'CSE',
-      'electronics': 'ECE', 'electronics and communication': 'ECE',
-      'electronics & communication': 'ECE', 'electronics and communication engineering': 'ECE',
-      'electrical': 'EEE', 'electrical engineering': 'EEE',
-      'mechanical': 'ME', 'mechanical engineering': 'ME',
-      'civil': 'CE', 'civil engineering': 'CE',
-      'information technology': 'IT', 'chemical': 'CHE', 'chemical engineering': 'CHE',
-    };
-    return map[dept.toLowerCase().trim()] || dept.toUpperCase();
-  };
+      'computer science': 'CSE',
+      'computer science and engineering': 'CSE',
+      electronics: 'ECE',
+      'electronics and communication': 'ECE',
+      'electronics & communication': 'ECE',
+      'electronics and communication engineering': 'ECE',
+      electrical: 'EEE',
+      'electrical engineering': 'EEE',
+      mechanical: 'ME',
+      'mechanical engineering': 'ME',
+      civil: 'CE',
+      'civil engineering': 'CE',
+      'information technology': 'IT',
+      chemical: 'CHE',
+      'chemical engineering': 'CHE',
+    }
+    return map[dept.toLowerCase().trim()] || dept.toUpperCase()
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        const res = await api.get(`/admin/faculty/${id}/students`);
-        setFaculty(res.data.faculty);
-        setAssignedStudents(res.data.assigned);
-        setUnassignedStudents(res.data.unassigned);
-        setOriginalAssignedIds(res.data.assigned.map(s => s._id));
+        setLoading(true)
+        const res = await api.get(`/admin/faculty/${id}/students`)
+        setFaculty(res.data.faculty)
+        setAssignedStudents(res.data.assigned)
+        setUnassignedStudents(res.data.unassigned)
+        setOriginalAssignedIds(res.data.assigned.map((s) => s._id))
       } catch (err) {
-        setFetchError(err.response?.data?.message || 'Failed to load data.');
+        setFetchError(err.response?.data?.message || 'Failed to load data.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchData();
-  }, [id]);
+    }
+    fetchData()
+  }, [id])
 
-  const filteredUnassigned = unassignedStudents.filter(student =>
-    student.name.toLowerCase().includes(unassignedSearchQuery.toLowerCase()) ||
-    (student.rollNumber || '').toLowerCase().includes(unassignedSearchQuery.toLowerCase())
-  );
+  const filteredUnassigned = unassignedStudents.filter(
+    (student) =>
+      student.name.toLowerCase().includes(unassignedSearchQuery.toLowerCase()) ||
+      (student.rollNumber || '').toLowerCase().includes(unassignedSearchQuery.toLowerCase())
+  )
 
-  const filteredAssigned = assignedStudents.filter(student =>
-    student.name.toLowerCase().includes(assignedSearchQuery.toLowerCase()) ||
-    (student.rollNumber || '').toLowerCase().includes(assignedSearchQuery.toLowerCase())
-  );
+  const filteredAssigned = assignedStudents.filter(
+    (student) =>
+      student.name.toLowerCase().includes(assignedSearchQuery.toLowerCase()) ||
+      (student.rollNumber || '').toLowerCase().includes(assignedSearchQuery.toLowerCase())
+  )
 
   const handleCheckUnassigned = (studentId) => {
-    setSelectedUnassigned(prev =>
-      prev.includes(studentId)
-        ? prev.filter(id => id !== studentId)
-        : [...prev, studentId]
-    );
-  };
+    setSelectedUnassigned((prev) =>
+      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+    )
+  }
 
   const handleCheckAssigned = (studentId) => {
-    setSelectedAssigned(prev =>
-      prev.includes(studentId)
-        ? prev.filter(id => id !== studentId)
-        : [...prev, studentId]
-    );
-  };
+    setSelectedAssigned((prev) =>
+      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+    )
+  }
 
   const handleSelectAllUnassigned = () => {
     if (selectedUnassigned.length === filteredUnassigned.length) {
-      setSelectedUnassigned([]);
+      setSelectedUnassigned([])
     } else {
-      setSelectedUnassigned(filteredUnassigned.map(s => s._id));
+      setSelectedUnassigned(filteredUnassigned.map((s) => s._id))
     }
-  };
+  }
 
   const handleAssignStudents = () => {
-    const toMove = unassignedStudents.filter(s => selectedUnassigned.includes(s._id));
-    setAssignedStudents(prev => [...prev, ...toMove]);
-    setUnassignedStudents(prev => prev.filter(s => !selectedUnassigned.includes(s._id)));
-    setSelectedUnassigned([]);
-  };
+    const toMove = unassignedStudents.filter((s) => selectedUnassigned.includes(s._id))
+    setAssignedStudents((prev) => [...prev, ...toMove])
+    setUnassignedStudents((prev) => prev.filter((s) => !selectedUnassigned.includes(s._id)))
+    setSelectedUnassigned([])
+  }
 
   const handleUnassignStudents = () => {
-    const toMove = assignedStudents.filter(s => selectedAssigned.includes(s._id));
-    setUnassignedStudents(prev => [...prev, ...toMove]);
-    setAssignedStudents(prev => prev.filter(s => !selectedAssigned.includes(s._id)));
-    setSelectedAssigned([]);
-  };
+    const toMove = assignedStudents.filter((s) => selectedAssigned.includes(s._id))
+    setUnassignedStudents((prev) => [...prev, ...toMove])
+    setAssignedStudents((prev) => prev.filter((s) => !selectedAssigned.includes(s._id)))
+    setSelectedAssigned([])
+  }
 
   const handleDiscardChanges = () => {
-    navigate('/faculty_advisor_management');
-  };
+    navigate('/faculty_advisor_management')
+  }
 
   const handleFinalizeAssignments = async () => {
     try {
-      setSaving(true);
-      const currentAssignedIds = assignedStudents.map(s => s._id);
-      const currentUnassignedIds = unassignedStudents.map(s => s._id);
-      const toAssign = currentAssignedIds.filter(sid => !originalAssignedIds.includes(sid));
-      const toUnassign = currentUnassignedIds.filter(sid => originalAssignedIds.includes(sid));
-      await api.put(`/admin/faculty/${id}/assign`, { toAssign, toUnassign });
-      navigate('/faculty_advisor_management');
-    } catch (err) {
-      setSaving(false);
+      setSaving(true)
+      const currentAssignedIds = assignedStudents.map((s) => s._id)
+      const currentUnassignedIds = unassignedStudents.map((s) => s._id)
+      const toAssign = currentAssignedIds.filter((sid) => !originalAssignedIds.includes(sid))
+      const toUnassign = currentUnassignedIds.filter((sid) => originalAssignedIds.includes(sid))
+      await api.put(`/admin/faculty/${id}/assign`, { toAssign, toUnassign })
+      navigate('/faculty_advisor_management')
+    } catch {
+      setSaving(false)
     }
-  };
+  }
 
   return (
-    <div className="h-screen overflow-hidden flex font-[Inter,sans-serif]" style={{backgroundColor: '#FFFBF2'}}>
+    <div
+      className="h-screen overflow-hidden flex font-[Inter,sans-serif]"
+      style={{ backgroundColor: '#FFFBF2' }}
+    >
       {/* Sidebar */}
-      <aside className="w-[260px] flex flex-col shrink-0 h-screen sticky top-0 px-4 pt-7 pb-5" style={{backgroundColor: '#000000', color: '#FFFFFF'}}>
+      <aside
+        className="w-[260px] flex flex-col shrink-0 h-screen sticky top-0 px-4 pt-7 pb-5"
+        style={{ backgroundColor: '#000000', color: '#FFFFFF' }}
+      >
         <div className="px-2 mb-9 flex items-center gap-2.5">
-          <span className="text-white text-[1.2rem] font-bold tracking-[0.3px]" style={{fontFamily: 'Poppins, sans-serif'}}>SAPT</span>
+          <span
+            className="text-white text-[1.2rem] font-bold tracking-[0.3px]"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
+            SAPT
+          </span>
         </div>
 
         <nav className="flex-1 flex flex-col gap-1">
-          <Link 
+          <Link
             to="/admin_dashboard"
             className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" strokeLinecap="round" strokeLinejoin="round"></path>
+            <svg
+              className="w-5 h-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
+              <path
+                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
             </svg>
             <span>Dashboard</span>
           </Link>
-          <Link 
+          <Link
             to="/admin_student_management"
             className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round"></path>
+            <svg
+              className="w-5 h-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
+              <path
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
             </svg>
             <span>Students</span>
           </Link>
-          <Link 
+          <Link
             to="/faculty_advisor_management"
             className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all font-semibold text-[0.92rem]"
-            style={{backgroundColor: '#f5a623', color: '#1a1a2e'}}
+            style={{ backgroundColor: '#f5a623', color: '#1a1a2e' }}
           >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <svg
+              className="w-5 h-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
               <path d="M12 14l9-5-9-5-9 5 9 5z" strokeLinecap="round" strokeLinejoin="round"></path>
-              <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" strokeLinecap="round" strokeLinejoin="round"></path>
-              <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" strokeLinecap="round" strokeLinejoin="round"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
+              <path
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
             </svg>
             <span>Faculty Members</span>
           </Link>
-          <Link 
+          <Link
             to="/reports_analytics"
             className="flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all text-[#9ca3af] hover:text-[#e5e7eb] hover:bg-white/5 font-medium text-[0.92rem]"
           >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round"></path>
+            <svg
+              className="w-5 h-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+            >
+              <path
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></path>
             </svg>
             <span>Reports</span>
           </Link>
         </nav>
 
-        <div ref={profileMenuRef} className="mt-auto" style={{position: 'relative'}}>
-          <div style={{height: '1px', background: 'rgba(255,255,255,0.1)', margin: '12px 8px 16px'}}></div>
-          
+        <div ref={profileMenuRef} className="mt-auto" style={{ position: 'relative' }}>
+          <div
+            style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '12px 8px 16px' }}
+          ></div>
+
           {/* Profile Popup Menu */}
           {showProfileMenu && (
-            <div style={{
-              position: 'absolute',
-              bottom: '70px',
-              left: '8px',
-              right: '8px',
-              backgroundColor: '#000000',
-              borderRadius: '12px',
-              padding: '8px',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-              zIndex: 50
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '70px',
+                left: '8px',
+                right: '8px',
+                backgroundColor: '#000000',
+                borderRadius: '12px',
+                padding: '8px',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+                zIndex: 50,
+              }}
+            >
               <button
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setShowProfileMenu(false);
-                  navigate('/profile_settings');
+                  e.stopPropagation()
+                  setShowProfileMenu(false)
+                  navigate('/profile_settings')
                 }}
                 style={{
                   width: '100%',
@@ -214,21 +279,33 @@ const AssignStudents = () => {
                   fontWeight: '500',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s',
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
                 }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')
+                }
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" strokeLinecap="round" strokeLinejoin="round"></path>
+                <svg
+                  className="w-[18px] h-[18px] flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                >
+                  <path
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
                 </svg>
                 View Profile
               </button>
               <button
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setShowProfileMenu(false);
-                  navigate('/login');
+                  e.stopPropagation()
+                  setShowProfileMenu(false)
+                  navigate('/login')
                 }}
                 style={{
                   width: '100%',
@@ -244,24 +321,39 @@ const AssignStudents = () => {
                   fontWeight: '500',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s',
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
                 }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)')
+                }
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
-                <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                  <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round"></path>
+                <svg
+                  className="w-[18px] h-[18px] flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                >
+                  <path
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></path>
                 </svg>
                 Logout
               </button>
             </div>
           )}
-          
+
           <div
             className="flex items-center gap-2.5 p-2 rounded-[10px] cursor-pointer hover:bg-white/[0.07] transition-colors"
             onClick={() => setShowProfileMenu(!showProfileMenu)}
           >
-            <div className="w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-[0.95rem]" style={{background: 'linear-gradient(135deg, #f5a623, #f7b731)', color: '#1a1a2e'}}>
+            <div
+              className="w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-[0.95rem]"
+              style={{ background: 'linear-gradient(135deg, #f5a623, #f7b731)', color: '#1a1a2e' }}
+            >
               A
             </div>
             <div className="flex flex-col">
@@ -273,236 +365,380 @@ const AssignStudents = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-y-auto" style={{backgroundColor: '#FFFBF2'}}>
+      <main className="flex-1 flex flex-col overflow-y-auto" style={{ backgroundColor: '#FFFBF2' }}>
         {/* Dashboard Body */}
         <div className="p-8 flex flex-col gap-8">
-        <h2 className="text-3xl font-bold" style={{color: '#1a1a2e'}}>Assign Students</h2>
+          <h2 className="text-3xl font-bold" style={{ color: '#1a1a2e' }}>
+            Assign Students
+          </h2>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-20" style={{color: '#6b7280'}}>Loading...</div>
-        ) : fetchError ? (
-          <div className="flex items-center justify-center py-20" style={{color: '#ef4444'}}>{fetchError}</div>
-        ) : (<>
-        {/* Advisor Profile Header */}
-        <section className="bg-primary/5 rounded-xl border border-primary/20 p-6 flex flex-col md:flex-row items-center gap-6 shadow-[0_0_20px_-5px_rgba(154,40,235,0.4)]">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0" style={{background: 'linear-gradient(135deg, #f5a623, #f7b731)', color: '#1a1a2e'}}>
-            {faculty?.name?.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-grow text-center md:text-left">
-            <h2 className="text-2xl font-bold" style={{color: '#1a1a2e'}}>{faculty?.name}</h2>
-          </div>
-          <div className="flex flex-col items-center md:items-end gap-1 px-8 py-3 bg-white/5 rounded-lg border border-white/10">
-            <span className="text-3xl font-bold text-primary">{assignedStudents.length}</span>
-            <span className="text-xs uppercase tracking-wider text-slate-500 font-bold">Current Students</span>
-          </div>
-        </section>
-
-        {/* Assignment Split Pane */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 flex-grow min-h-[500px]">
-          {/* Left Pane: Unassigned Students */}
-          <div className={`rounded-xl flex flex-col overflow-hidden shadow-xl border`} style={{backgroundColor: '#ffffff', borderColor: '#e5e1d8'}}>
-            <div className="p-5 border-b" style={{borderColor: '#e5e1d8'}}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className={`font-bold text-lg`} style={{color: '#1a1a2e'}}>Unassigned Students</h3>
-                <span className="text-xs px-2 py-1 rounded" style={{backgroundColor: '#fafaf8', color: '#6b7280'}}>{unassignedStudents.length} Total</span>
-              </div>
-              <div className="relative group">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 transition-colors" style={{color: '#9ca3af'}}>
-                  search
-                </span>
-                <input 
-                  className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 transition-all"
-                  style={{
-                    backgroundColor: '#fafaf8',
-                    borderColor: '#e5e1d8',
-                    color: '#1a1a2e'
-                  }}
-                  placeholder="Search by name or ID..." 
-                  type="text"
-                  value={unassignedSearchQuery}
-                  onChange={(e) => setUnassignedSearchQuery(e.target.value)}
-                  onFocus={(e) => e.target.style.borderColor = '#f5a623'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
-                />
-              </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-20" style={{ color: '#6b7280' }}>
+              Loading...
             </div>
-            <div className="flex-grow overflow-y-auto p-2 custom-scrollbar">
-              <div className="space-y-1">
-                {filteredUnassigned.map((student) => (
-                  <div 
-                    key={student._id}
-                    className={`flex items-center gap-4 p-3 rounded-lg transition-colors group cursor-pointer border ${
-                      selectedUnassigned.includes(student._id)
-                        ? 'border-primary/20'
-                        : 'border-transparent hover:border-primary/20'
-                    }`}
-                    style={{
-                      backgroundColor: selectedUnassigned.includes(student._id) ? '#fff4e6' : '#fafaf8'
-                    }}
-                    onClick={() => handleCheckUnassigned(student._id)}
-                  >
-                    <input 
-                      className="w-5 h-5 rounded bg-transparent text-primary focus:ring-primary cursor-pointer"
-                      style={{borderColor: '#d1d5db'}}
-                      type="checkbox"
-                      checked={selectedUnassigned.includes(student._id)}
-                      onChange={() => {}}
-                    />
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden" style={{backgroundColor: '#e5e1d8', color: '#1a1a2e'}}>
-                      <span className="text-sm">{student.name.split(' ').map(n => n[0]).join('')}</span>
-                    </div>
-                    <div className="flex-grow min-w-0">
-                      <p className={`font-medium text-sm truncate`} style={{color: '#1a1a2e'}}>{student.name}</p>
-                      <p className="text-xs truncate" style={{color: '#6b7280'}}>{deptAbbr(student.department)} • {student.rollNumber || '—'}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          ) : fetchError ? (
+            <div className="flex items-center justify-center py-20" style={{ color: '#ef4444' }}>
+              {fetchError}
             </div>
-            <div className="p-3 border-t flex justify-between items-center" style={{backgroundColor: '#fafaf8', borderColor: '#e5e1d8'}}>
-              <button 
-                className="text-xs hover:brightness-110 transition-colors underline"
-                style={{color: '#6b7280', textDecorationColor: '#f5a623'}}
-                onClick={handleSelectAllUnassigned}
+          ) : (
+            <>
+              {/* Advisor Profile Header */}
+              <section
+                className="rounded-xl border p-6 flex flex-col md:flex-row items-center gap-6"
+                style={{
+                  backgroundColor: '#14213d',
+                  borderColor: 'rgba(255,255,255,0.16)',
+                  boxShadow: '0 0 22px rgba(154,40,235,0.25), 0 0 30px rgba(245,164,34,0.28)',
+                }}
               >
-                {selectedUnassigned.length === filteredUnassigned.length ? 'Deselect All' : 'Select All Unassigned'}
-              </button>
-              <span className="text-[10px] uppercase tracking-widest font-bold" style={{color: '#6b7280'}}>
-                {selectedUnassigned.length} selected
-              </span>
-            </div>
-          </div>
-
-          {/* Central Column: Action Buttons */}
-          <div className="flex lg:flex-col justify-center gap-4 items-center">
-            <button 
-              className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_30px_-2px_rgba(154,40,235,0.6)] hover:scale-110 active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              onClick={handleAssignStudents}
-              disabled={selectedUnassigned.length === 0}
-              title="Assign selected students"
-            >
-              <span className="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">
-                arrow_forward
-              </span>
-            </button>
-            <button 
-              className="w-14 h-14 rounded-full bg-slate-800 border border-primary/30 flex items-center justify-center shadow-lg hover:border-primary active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={handleUnassignStudents}
-              disabled={selectedAssigned.length === 0}
-              title="Unassign selected students"
-            >
-              <span className="material-symbols-outlined text-primary group-hover:-translate-x-1 transition-transform">
-                arrow_back
-              </span>
-            </button>
-          </div>
-
-          {/* Right Pane: Currently Assigned Students */}
-          <div className={`rounded-xl flex flex-col overflow-hidden shadow-xl border`} style={{backgroundColor: '#ffffff', borderColor: '#e5e1d8'}}>
-            <div className="p-5 border-b" style={{borderColor: '#e5e1d8', backgroundColor: '#fafaf8'}}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className={`font-bold text-lg`} style={{color: '#1a1a2e'}}>Assigned to {faculty?.name}</h3>
-                <span className="text-xs px-2 py-1 rounded font-bold" style={{backgroundColor: '#fff4e6', color: '#f5a623'}}>{assignedStudents.length} Active</span>
-              </div>
-              <div className="relative group">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 transition-colors" style={{color: '#9ca3af'}}>
-                  search
-                </span>
-                <input 
-                  className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 transition-all"
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
                   style={{
-                    backgroundColor: '#ffffff',
-                    borderColor: '#e5e1d8',
-                    color: '#1a1a2e'
+                    background: 'linear-gradient(135deg, #f5a623, #f7b731)',
+                    color: '#1a1a2e',
                   }}
-                  placeholder="Filter assigned students..." 
-                  type="text"
-                  value={assignedSearchQuery}
-                  onChange={(e) => setAssignedSearchQuery(e.target.value)}
-                  onFocus={(e) => e.target.style.borderColor = '#f5a623'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e1d8'}
-                />
-              </div>
-            </div>
-            <div className="flex-grow overflow-y-auto p-2 custom-scrollbar">
-              <div className="space-y-1">
-                {filteredAssigned.map((student) => (
-                  <div 
-                    key={student._id}
-                    className={`flex items-center gap-4 p-3 rounded-lg transition-colors group cursor-pointer border ${
-                      selectedAssigned.includes(student._id)
-                        ? 'border-primary/20'
-                        : 'border-transparent hover:border-primary/20'
-                    }`}
-                    style={{
-                      backgroundColor: selectedAssigned.includes(student._id) ? '#fff4e6' : '#fafaf8'
-                    }}
-                    onClick={() => handleCheckAssigned(student._id)}
-                  >
-                    <input 
-                      className="w-5 h-5 rounded bg-transparent text-primary focus:ring-primary cursor-pointer"
-                      style={{borderColor: '#d1d5db'}}
-                      type="checkbox"
-                      checked={selectedAssigned.includes(student._id)}
-                      onChange={() => {}}
-                    />
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden" style={{backgroundColor: '#e5e1d8', color: '#1a1a2e'}}>
-                      <span className="text-sm">{student.name.split(' ').map(n => n[0]).join('')}</span>
-                    </div>
-                    <div className="flex-grow min-w-0">
-                      <p className={`font-medium text-sm truncate`} style={{color: '#1a1a2e'}}>{student.name}</p>
-                      <p className="text-xs truncate" style={{color: '#6b7280'}}>{deptAbbr(student.department)} • {student.rollNumber || '—'}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="p-3 border-t flex justify-end" style={{backgroundColor: '#fafaf8', borderColor: '#e5e1d8'}}>
-              <span className="text-xs" style={{color: '#6b7280'}}>Last updated: Today, 10:24 AM</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Sticky Footer Action Bar */}
-        <footer className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-          <div className="flex items-center gap-6">
-            <div className="flex -space-x-3 overflow-hidden">
-              {selectedUnassigned.slice(0, 2).map((_id) => {
-                const student = unassignedStudents.find(s => s._id === _id);
-                return (
-                  <div key={_id} className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-slate-800 flex items-center justify-center text-[10px] font-bold text-white">
-                    {student?.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                );
-              })}
-              {selectedUnassigned.length > 2 && (
-                <div className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                  +{selectedUnassigned.length - 2}
+                >
+                  {faculty?.name?.charAt(0).toUpperCase()}
                 </div>
-              )}
-            </div>
-            <div className="text-sm">
-              <span className="text-primary font-bold">{selectedUnassigned.length} students</span> selected to be added to this advisor.
-            </div>
-          </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button 
-              className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors"
-              onClick={handleDiscardChanges}
-            >
-              Discard Changes
-            </button>
-            <button 
-              className="flex-1 sm:flex-none px-8 py-2.5 bg-primary text-white rounded-lg font-bold shadow-[0_0_30px_-2px_rgba(154,40,235,0.6)] hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              onClick={handleFinalizeAssignments}
-              disabled={saving}
-            >
-              <span className="material-symbols-outlined text-sm">check_circle</span>
-              {saving ? 'Saving...' : 'Finalize Assignments'}
-            </button>
-          </div>
-        </footer>
-        </>)}
+                <div className="flex-grow text-center md:text-left">
+                  <h2 className="text-2xl font-bold" style={{ color: '#ffffff' }}>
+                    {faculty?.name}
+                  </h2>
+                  <p className="text-sm mt-1" style={{ color: '#ffffff' }}>
+                    Office: {faculty?.office || '—'}
+                  </p>
+                  <p className="text-sm" style={{ color: '#ffffff' }}>
+                    Email: {faculty?.email || '—'}
+                  </p>
+                </div>
+                <div
+                  className="flex flex-col items-center md:items-end gap-1 px-2 py-1 rounded-lg"
+                  style={{ backgroundColor: '#14213d' }}
+                >
+                  <span className="text-3xl font-bold" style={{ color: '#ffffff' }}>
+                    {assignedStudents.length}
+                  </span>
+                  <span
+                    className="text-xs uppercase tracking-wider font-bold"
+                    style={{ color: '#ffffff' }}
+                  >
+                    Current Students
+                  </span>
+                </div>
+              </section>
+
+              {/* Assignment Split Pane */}
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 flex-grow min-h-[500px]">
+                {/* Left Pane: Unassigned Students */}
+                <div
+                  className={`rounded-xl flex flex-col overflow-hidden shadow-xl border`}
+                  style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d8' }}
+                >
+                  <div
+                    className="p-5 border-b"
+                    style={{ borderColor: '#e5e1d8', backgroundColor: '#14213d' }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className={`font-bold text-lg`} style={{ color: '#ffffff' }}>
+                        Unassigned Students
+                      </h3>
+                      <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>
+                        {unassignedStudents.length} Total
+                      </span>
+                    </div>
+                    <div className="relative group">
+                      <span
+                        className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 transition-colors"
+                        style={{ color: '#9ca3af' }}
+                      >
+                        search
+                      </span>
+                      <input
+                        className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 transition-all"
+                        style={{
+                          backgroundColor: '#ffffff',
+                          borderColor: '#e5e1d8',
+                          color: '#1a1a2e',
+                        }}
+                        placeholder="Search by name or ID..."
+                        type="text"
+                        value={unassignedSearchQuery}
+                        onChange={(e) => setUnassignedSearchQuery(e.target.value)}
+                        onFocus={(e) => (e.target.style.borderColor = '#f5a623')}
+                        onBlur={(e) => (e.target.style.borderColor = '#e5e1d8')}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-grow overflow-y-auto p-0 custom-scrollbar">
+                    <div>
+                      {filteredUnassigned.map((student) => (
+                        <div
+                          key={student._id}
+                          className="flex items-center gap-4 p-3 transition-colors group cursor-pointer border-b"
+                          style={{ borderColor: '#e5e1d8' }}
+                          onClick={() => handleCheckUnassigned(student._id)}
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fafaf8')}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                        >
+                          <input
+                            className="w-5 h-5 rounded bg-transparent cursor-pointer"
+                            style={{ borderColor: '#d1d5db', accentColor: '#f5a623' }}
+                            type="checkbox"
+                            checked={selectedUnassigned.includes(student._id)}
+                            onChange={() => {}}
+                          />
+                          <div
+                            className="w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden"
+                            style={{ backgroundColor: '#e5e1d8', color: '#1a1a2e' }}
+                          >
+                            <span className="text-sm">
+                              {student.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')}
+                            </span>
+                          </div>
+                          <div className="flex-grow min-w-0">
+                            <p
+                              className={`font-medium text-sm truncate`}
+                              style={{ color: '#1a1a2e' }}
+                            >
+                              {student.name}
+                            </p>
+                            <p className="text-xs truncate" style={{ color: '#6b7280' }}>
+                              {deptAbbr(student.department)} • {student.rollNumber || '—'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div
+                    className="p-3 border-t flex justify-between items-center"
+                    style={{ backgroundColor: '#14213d', borderColor: '#e5e1d8' }}
+                  >
+                    <button
+                      className="text-xs hover:brightness-110 transition-colors underline"
+                      style={{ color: '#ffffff', textDecorationColor: '#ffffff' }}
+                      onClick={handleSelectAllUnassigned}
+                    >
+                      {selectedUnassigned.length === filteredUnassigned.length
+                        ? 'Deselect All'
+                        : 'Select All Unassigned'}
+                    </button>
+                    <span
+                      className="text-[10px] uppercase tracking-widest font-bold"
+                      style={{ color: '#ffffff' }}
+                    >
+                      {selectedUnassigned.length} selected
+                    </span>
+                  </div>
+                </div>
+
+                {/* Central Column: Action Buttons */}
+                <div className="flex lg:flex-col justify-center gap-4 items-center">
+                  <button
+                    className="w-14 h-14 rounded-xl border flex items-center justify-center hover:scale-105 active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    style={{
+                      backgroundColor: '#000000',
+                      borderColor: '#1f2937',
+                      boxShadow: '0 0 18px rgba(154,40,235,0.22), 0 0 26px rgba(245,164,34,0.26)',
+                    }}
+                    onClick={handleAssignStudents}
+                    disabled={selectedUnassigned.length === 0}
+                    title="Assign selected students"
+                  >
+                    <span
+                      className="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+                      style={{ color: '#f5a623' }}
+                    >
+                      arrow_forward
+                    </span>
+                  </button>
+                  <button
+                    className="w-14 h-14 rounded-xl border flex items-center justify-center active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d8' }}
+                    onClick={handleUnassignStudents}
+                    disabled={selectedAssigned.length === 0}
+                    title="Unassign selected students"
+                  >
+                    <span
+                      className="material-symbols-outlined group-hover:-translate-x-1 transition-transform"
+                      style={{ color: '#f5a623' }}
+                    >
+                      arrow_back
+                    </span>
+                  </button>
+                </div>
+
+                {/* Right Pane: Currently Assigned Students */}
+                <div
+                  className={`rounded-xl flex flex-col overflow-hidden shadow-xl border`}
+                  style={{ backgroundColor: '#ffffff', borderColor: '#e5e1d8' }}
+                >
+                  <div
+                    className="p-5 border-b"
+                    style={{ borderColor: '#e5e1d8', backgroundColor: '#14213d' }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className={`font-bold text-lg`} style={{ color: '#ffffff' }}>
+                        Assigned to {faculty?.name}
+                      </h3>
+                      <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>
+                        {assignedStudents.length} Active
+                      </span>
+                    </div>
+                    <div className="relative group">
+                      <span
+                        className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 transition-colors"
+                        style={{ color: '#9ca3af' }}
+                      >
+                        search
+                      </span>
+                      <input
+                        className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 transition-all"
+                        style={{
+                          backgroundColor: '#ffffff',
+                          borderColor: '#e5e1d8',
+                          color: '#1a1a2e',
+                        }}
+                        placeholder="Filter assigned students..."
+                        type="text"
+                        value={assignedSearchQuery}
+                        onChange={(e) => setAssignedSearchQuery(e.target.value)}
+                        onFocus={(e) => (e.target.style.borderColor = '#f5a623')}
+                        onBlur={(e) => (e.target.style.borderColor = '#e5e1d8')}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-grow overflow-y-auto p-0 custom-scrollbar">
+                    <div>
+                      {filteredAssigned.map((student) => (
+                        <div
+                          key={student._id}
+                          className="flex items-center gap-4 p-3 transition-colors group cursor-pointer border-b"
+                          style={{ borderColor: '#e5e1d8' }}
+                          onClick={() => handleCheckAssigned(student._id)}
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#fafaf8')}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                        >
+                          <input
+                            className="w-5 h-5 rounded bg-transparent cursor-pointer"
+                            style={{ borderColor: '#d1d5db', accentColor: '#f5a623' }}
+                            type="checkbox"
+                            checked={selectedAssigned.includes(student._id)}
+                            onChange={() => {}}
+                          />
+                          <div
+                            className="w-10 h-10 rounded-full flex items-center justify-center font-bold overflow-hidden"
+                            style={{ backgroundColor: '#e5e1d8', color: '#1a1a2e' }}
+                          >
+                            <span className="text-sm">
+                              {student.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')}
+                            </span>
+                          </div>
+                          <div className="flex-grow min-w-0">
+                            <p
+                              className={`font-medium text-sm truncate`}
+                              style={{ color: '#1a1a2e' }}
+                            >
+                              {student.name}
+                            </p>
+                            <p className="text-xs truncate" style={{ color: '#6b7280' }}>
+                              {deptAbbr(student.department)} • {student.rollNumber || '—'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div
+                    className="p-3 border-t flex justify-between items-center"
+                    style={{ backgroundColor: '#14213d', borderColor: '#e5e1d8' }}
+                  >
+                    <button
+                      className="text-xs hover:brightness-110 transition-colors underline"
+                      style={{ color: '#ffffff', textDecorationColor: '#ffffff' }}
+                      onClick={() => setSelectedAssigned([])}
+                    >
+                      Deselect All
+                    </button>
+                    <span
+                      className="text-[10px] uppercase tracking-widest font-bold"
+                      style={{ color: '#ffffff' }}
+                    >
+                      {selectedAssigned.length} selected
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sticky Footer Action Bar */}
+              <footer
+                className="border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-4"
+                style={{ backgroundColor: '#14213d', borderColor: 'rgba(255,255,255,0.16)' }}
+              >
+                <div className="flex items-center gap-6">
+                  <div className="flex -space-x-3 overflow-hidden">
+                    {selectedUnassigned.slice(0, 2).map((_id) => {
+                      const student = unassignedStudents.find((s) => s._id === _id)
+                      return (
+                        <div
+                          key={_id}
+                          className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-slate-800 flex items-center justify-center text-[10px] font-bold text-white"
+                        >
+                          {student?.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')}
+                        </div>
+                      )
+                    })}
+                    {selectedUnassigned.length > 2 && (
+                      <div className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                        +{selectedUnassigned.length - 2}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-sm" style={{ color: '#ffffff' }}>
+                    <span className="font-bold" style={{ color: '#ffffff' }}>
+                      {selectedUnassigned.length} students
+                    </span>{' '}
+                    selected to be added to this advisor.
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <button
+                    className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-semibold transition-colors rounded-xl border"
+                    style={{
+                      backgroundColor: '#14213d',
+                      borderColor: 'rgba(255,255,255,0.5)',
+                      color: '#ffffff',
+                    }}
+                    onClick={handleDiscardChanges}
+                  >
+                    Discard Changes
+                  </button>
+                  <button
+                    className="flex-1 sm:flex-none px-8 py-2.5 rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: '#14213d',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255,255,255,0.5)',
+                    }}
+                    onClick={handleFinalizeAssignments}
+                    disabled={saving}
+                  >
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
+                    {saving ? 'Saving...' : 'Finalize Assignments'}
+                  </button>
+                </div>
+              </footer>
+            </>
+          )}
         </div>
       </main>
 
@@ -514,15 +750,15 @@ const AssignStudents = () => {
           background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #9a28eb44;
+          background: #f5a62366;
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #9a28eb;
+          background: #f5a623;
         }
       `}</style>
     </div>
-  );
-};
+  )
+}
 
-export default AssignStudents;
+export default AssignStudents
