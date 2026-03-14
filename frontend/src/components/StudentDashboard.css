@@ -1,437 +1,437 @@
 /* ========== Dashboard Layout ========== */
 .dashboard {
-    padding: 32px 40px;
-    width: 100%;
-    box-sizing: border-box;
+  padding: 32px 40px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ========== Header ========== */
 .dashboard-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
 }
 
 .dashboard-title {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin: 0 0 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 4px;
 }
 
 .dashboard-subtitle {
-    font-size: 0.92rem;
-    color: #6b7280;
-    margin: 0;
+  font-size: 0.92rem;
+  color: #6b7280;
+  margin: 0;
 }
 
 .notification-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.35rem;
-    color: #6b7280;
-    padding: 8px;
-    border-radius: 8px;
-    transition: background 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.35rem;
+  color: #6b7280;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
 }
 
 .notification-btn:hover {
-    background: rgba(0, 0, 0, 0.04);
-    color: #1a1a2e;
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1a2e;
 }
 
 /* ========== Cards ========== */
 .card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 /* ========== Grid ========== */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: 0.7fr 0.7fr 1.6fr;
-    gap: 32px;
-    margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 0.7fr 0.7fr 1.6fr;
+  gap: 32px;
+  margin-bottom: 32px;
 }
 
 /* ========== Activity Points Card ========== */
 .card-points {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #6b7280;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
 .points-value {
-    font-family: 'Poppins', sans-serif;
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin: 8px 0 0;
-    line-height: 1.1;
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 8px 0 0;
+  line-height: 1.1;
 }
 
 .progress-section {
-    margin-top: auto;
-    padding-top: 28px;
+  margin-top: auto;
+  padding-top: 28px;
 }
 
 .progress-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: #6b7280;
-    letter-spacing: 0.5px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.5px;
 }
 
 .progress-bar-track {
-    height: 6px;
-    background: #f0ede5;
-    border-radius: 999px;
-    margin: 8px 0 6px;
-    position: relative;
-    overflow: hidden;
+  height: 6px;
+  background: #f0ede5;
+  border-radius: 999px;
+  margin: 8px 0 6px;
+  position: relative;
+  overflow: hidden;
 }
 
 .progress-bar-fill {
-    height: 100%;
-    border-radius: 999px;
-    position: absolute;
-    top: 0;
-    left: 0;
+  height: 100%;
+  border-radius: 999px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .institute-fill {
-    background: #4C9AFF;
-    z-index: 2;
+  background: #4c9aff;
+  z-index: 2;
 }
 
 .department-fill {
-    background: #E8A0BF;
-    z-index: 1;
+  background: #e8a0bf;
+  z-index: 1;
 }
 
 .progress-legend {
-    display: flex;
-    gap: 16px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+  display: flex;
+  gap: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .legend-institute {
-    color: #4C9AFF;
+  color: #4c9aff;
 }
 
 .legend-department {
-    color: #E8A0BF;
+  color: #e8a0bf;
 }
 
 /* ========== Graduation Progress Card ========== */
 .card-graduation {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .grad-chart-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .grad-labels {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
 }
 
 .grad-label-row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.62rem;
-    font-weight: 600;
-    color: #6b7280;
-    letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.4px;
 }
 
 .grad-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
 }
 
 .grad-stats {
-    display: flex;
-    gap: 40px;
-    margin-top: 4px;
+  display: flex;
+  gap: 40px;
+  margin-top: 4px;
 }
 
 .grad-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .grad-stat-value {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.35rem;
-    font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
 .institute-color {
-    color: #4C9AFF;
+  color: #4c9aff;
 }
 
 .department-color {
-    color: #E8A0BF;
+  color: #e8a0bf;
 }
 
 .grad-stat-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: #6b7280;
-    letter-spacing: 0.4px;
-    margin-top: 2px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.4px;
+  margin-top: 2px;
 }
 
 /* ========== Recent Activity Card ========== */
 .card-recent {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
 }
 
 .card-heading {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
 }
 
 .view-all-btn {
-    background: none;
-    border: none;
-    color: #f5a623;
-    font-weight: 700;
-    font-size: 0.78rem;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    font-family: inherit;
+  background: none;
+  border: none;
+  color: #f5a623;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .view-all-btn:hover {
-    color: #d4891a;
+  color: #d4891a;
 }
 
 .recent-table-header {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 0.5fr 1fr;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f0ede5;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #6b7280;
-    letter-spacing: 0.5px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.5fr 1fr;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0ede5;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.5px;
 }
 
 .recent-table-header span:last-child {
-    justify-self: end;
+  justify-self: end;
 }
 
 .recent-row {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 0.5fr 1fr;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid #f7f5f0;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.5fr 1fr;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f7f5f0;
 }
 
 .recent-row > *:last-child {
-    justify-self: end;
+  justify-self: end;
 }
 
 .recent-row:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .recent-row:hover {
-    background: #fffbf2;
+  background: #fffbf2;
 }
 
 .recent-activity-info {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .recent-name {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1a1a2e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
 }
 
 .recent-date {
-    font-size: 0.72rem;
-    color: #9ca3af;
-    margin-top: 2px;
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 2px;
 }
 
 .category-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  width: fit-content;
 }
 
 .category-badge.department {
-    color: #E8A0BF;
-    border: 1.5px solid #E8A0BF;
+  color: #e8a0bf;
+  border: 1.5px solid #e8a0bf;
 }
 
 .category-badge.institute {
-    color: #4C9AFF;
-    border: 1.5px solid #4C9AFF;
+  color: #4c9aff;
+  border: 1.5px solid #4c9aff;
 }
 
 .recent-points {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: #1a1a2e;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1a1a2e;
 }
 
 .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
 .dot-orange {
-    background: #f5a623;
+  background: #f5a623;
 }
 
 .dot-green {
-    background: #22c55e;
+  background: #22c55e;
 }
 
 .dot-red {
-    background: #ef4444;
+  background: #ef4444;
 }
 
 /* ========== Semester Card ========== */
 .card-semester {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .card-semester .card-heading {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 /* ========== Responsive ========== */
 @media (max-width: 1024px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
-    .card-recent {
-        grid-column: 1 / -1;
-    }
+  .card-recent {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 640px) {
-    .dashboard {
-        padding: 20px 16px;
-    }
+  .dashboard {
+    padding: 20px 16px;
+  }
 
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ========== Deadlines Card ========== */
 .card-deadlines {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .card-deadlines .card-heading {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .deadlines-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .deadline-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: 16px;
-    padding: 14px 0;
-    border-bottom: 1px solid #f0ede5;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0ede5;
 }
 
 .deadline-row:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .deadline-info {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .deadline-title {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #1a1a2e;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1a1a2e;
 }
 
 .deadline-date {
-    font-size: 0.72rem;
-    color: #9ca3af;
-    margin-top: 2px;
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 2px;
 }
 
 .deadline-countdown {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #16a34a;
-    background: #dcfce7;
-    padding: 4px 12px;
-    border-radius: 999px;
-    white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .deadline-countdown.urgent {
-    color: #dc2626;
-    background: #fee2e2;
+  color: #dc2626;
+  background: #fee2e2;
 }
