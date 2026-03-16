@@ -1,33 +1,111 @@
-import { useState } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { Mail } from 'lucide-react'
 import MailModal from './FacultyMailModal'
+import { facultyApi } from '../services/api'
 import styles from './FacultyAssignedStudentsPage.module.css'
-
-const allStudents = [
-  { id: 1, name: 'Aditi Sharma', studentId: 'B260001CS', institutePoints: 45, deptPoints: 30, total: 75 },
-  { id: 2, name: 'Rahul Verma', studentId: 'B260005CS', institutePoints: 50, deptPoints: 20, total: 70 },
-  { id: 3, name: 'Sneha Kapoor', studentId: 'B260012CS', institutePoints: 35, deptPoints: 40, total: 75 },
-  { id: 4, name: 'Arjun Das', studentId: 'B260008CS', institutePoints: 60, deptPoints: 15, total: 75 },
-  { id: 5, name: 'Priya Nair', studentId: 'B260022CS', institutePoints: 42, deptPoints: 50, total: 92 },
-  { id: 6, name: 'Karan Mehta', studentId: 'B260031CS', institutePoints: 38, deptPoints: 25, total: 63 },
-  { id: 7, name: 'Divya Iyer', studentId: 'B260044CS', institutePoints: 55, deptPoints: 35, total: 90 },
-  { id: 8, name: 'Rohan Gupta', studentId: 'B260017CS', institutePoints: 20, deptPoints: 45, total: 65 },
-  { id: 9, name: 'Ananya Rao', studentId: 'B260039CS', institutePoints: 70, deptPoints: 10, total: 80 },
-  { id: 10, name: 'Vikram Singh', studentId: 'B260055CS', institutePoints: 48, deptPoints: 32, total: 80 },
-  { id: 11, name: 'Meera Pillai', studentId: 'B260061CS', institutePoints: 33, deptPoints: 55, total: 88 },
-  { id: 12, name: 'Suresh Babu', studentId: 'B260072CS', institutePoints: 62, deptPoints: 18, total: 80 },
-]
 
 const PAGE_SIZE = 5
 
 export default function AssignedStudentsPage() {
+  const [allStudents, setAllStudents] = useState([])
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [mailTarget, setMailTarget] = useState(null)
+  const [expandedStudentId, setExpandedStudentId] = useState(null)
+  const [history, setHistory] = useState({}) // { studentId: [submissions] }
+  const [historyState, setHistoryState] = useState({}) // { studentId: { loading: bool, error: string } }
 
-  const filtered = allStudents.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.studentId.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetchStudents()
+  }, [])
+
+  const fetchStudents = async () => {
+    try {
+      const res = await facultyApi.getStudents()
+      if (res.data.success) {
+        const mapped = res.data.data.map((s) => ({
+          id: s._id,
+          name: s.name,
+          email: s.email,
+          studentId: s.rollNumber || 'N/A',
+          institutePoints: s.stats?.institutePoints || 0,
+          deptPoints: s.stats?.departmentPoints || 0,
+          total: s.stats?.totalPoints || 0,
+        }))
+        setAllStudents(mapped)
+      }
+    } catch (err) {
+      console.error('Error fetching assigned students:', err)
+    }
+  }
+
+  const handleRowClick = async (studentId) => {
+    if (expandedStudentId === studentId) {
+      setExpandedStudentId(null)
+      return
+    }
+
+    setExpandedStudentId(studentId)
+
+    // Fetch history if not already loaded or if there was an error
+    if (!history[studentId] || historyState[studentId]?.error) {
+      try {
+        setHistoryState((prev) => ({ ...prev, [studentId]: { loading: true, error: null } }))
+        const res = await facultyApi.getStudentHistory(studentId)
+
+        if (res.data.success) {
+          setHistory((prev) => ({ ...prev, [studentId]: res.data.data }))
+          setHistoryState((prev) => ({ ...prev, [studentId]: { loading: false, error: null } }))
+        } else {
+          throw new Error(res.data.message || 'Failed to fetch history')
+        }
+      } catch (err) {
+        console.error('Error fetching student history:', err)
+        setHistoryState((prev) => ({
+          ...prev,
+          [studentId]: { loading: false, error: err.response?.data?.message || err.message },
+        }))
+      }
+    }
+  }
+
+  const handleExportPDF = async (e, studentId, studentName) => {
+    e.stopPropagation() // Prevent row expansion
+    try {
+      const res = await facultyApi.exportPDF(studentId)
+      const blob = new Blob([res.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Report_${studentName.replace(/\s+/g, '_')}.pdf`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Error exporting PDF:', err)
+      alert('Failed to export PDF')
+    }
+  }
+
+  const handleExportAllPDF = async () => {
+    try {
+      const res = await facultyApi.exportAllPDFs()
+      const blob = new Blob([res.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Bulk_Student_Report_${new Date().toISOString().split('T')[0]}.pdf`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Error exporting bulk PDF:', err)
+      alert('Failed to export bulk PDF')
+    }
+  }
+
+  const filtered = allStudents.filter(
+    (s) =>
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.studentId.toLowerCase().includes(search.toLowerCase())
   )
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
@@ -35,12 +113,13 @@ export default function AssignedStudentsPage() {
 
   return (
     <div className={styles.page}>
-
-      {/* ── Page Header ── */}
+      {/* -- Page Header -- */}
       <div className={styles.pageHeader}>
         <div>
           <h1 className={styles.pageTitle}>Assigned Students</h1>
-          <p className={styles.pageSubtitle}>Manage and monitor student progress for your current cohort.</p>
+          <p className={styles.pageSubtitle}>
+            Manage and monitor student progress for your current cohort.
+          </p>
         </div>
       </div>
 
@@ -48,25 +127,46 @@ export default function AssignedStudentsPage() {
         <div className={styles.searchWrapper}>
           <svg className={styles.searchIcon} width="16" height="16" fill="none" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-            <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path
+              d="M16.5 16.5L21 21"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
           <input
             type="text"
             placeholder="Search by student name or ID..."
             className={styles.searchInput}
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
           />
         </div>
         <button className={styles.searchBtn}>Search</button>
+
+        <button className={styles.exportAllBtn} onClick={handleExportAllPDF}>
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+            <path
+              d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Export All (PDF)
+        </button>
       </div>
 
-
-      {/* ── Table ── */}
+      {/* -- Table -- */}
       <div className={styles.tableWrapper}>
         <table className={styles.table}>
           <thead>
             <tr>
+              <th style={{ width: '40px' }}></th>
               <th>STUDENT NAME</th>
               <th>STUDENT ID</th>
               <th>INSTITUTE POINTS</th>
@@ -76,74 +176,199 @@ export default function AssignedStudentsPage() {
             </tr>
           </thead>
           <tbody>
-            {paginated.length > 0 ? paginated.map((s) => (
-              <tr key={s.id}>
-                <td className={styles.nameCell}>{s.name}</td>
-                <td className={styles.idCell}>{s.studentId}</td>
-                <td className={styles.institutePoints}>{s.institutePoints}</td>
-                <td className={styles.deptPoints}>{s.deptPoints}</td>
-                <td><span className={styles.totalBadge}>{s.total}</span></td>
-                <td>
-                  <div className={styles.actionGroup}>
-                    <button
-                      className={styles.mailBtn}
-                      onClick={() => setMailTarget(s)}
-                    >
-                      <Mail size={16} />
-                    </button>
-                    <button className={styles.exportBtn}>
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                        <path d="M12 3v13M7 11l5 5 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M5 21h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            {paginated.length > 0 ? (
+              paginated.map((s) => (
+                <Fragment key={s.id}>
+                  <tr className={styles.clickableRow} onClick={() => handleRowClick(s.id)}>
+                    <td>
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className={`${styles.chevron} ${expandedStudentId === s.id ? styles.expanded : ''}`}
+                      >
+                        <path
+                          d="M9 18l6-6-6-6"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
-                      Export
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )) : (
+                    </td>
+                    <td className={styles.nameCell}>{s.name}</td>
+                    <td className={styles.idCell}>{s.studentId}</td>
+                    <td className={styles.institutePoints}>{s.institutePoints}</td>
+                    <td className={styles.deptPoints}>{s.deptPoints}</td>
+                    <td>
+                      <span className={styles.totalBadge}>{s.total}</span>
+                    </td>
+                    <td>
+                      <div className={styles.actionGroup}>
+                        <button
+                          className={styles.mailBtn}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setMailTarget(s)
+                          }}
+                        >
+                          <Mail size={16} />
+                        </button>
+                        <button
+                          className={styles.exportBtn}
+                          onClick={(e) => handleExportPDF(e, s.id, s.name)}
+                        >
+                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+                            <path
+                              d="M12 3v13M7 11l5 5 5-5"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 21h14"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          Export PDF
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedStudentId === s.id && (
+                    <tr className={styles.historyRow}>
+                      <td colSpan={7}>
+                        <div className={styles.historyContent}>
+                          <h4 className={styles.historyTitle}>Submission History</h4>
+                          {historyState[s.id]?.loading ? (
+                            <div className={styles.historyLoader}>Loading history...</div>
+                          ) : historyState[s.id]?.error ? (
+                            <div className={styles.historyError}>
+                              Error: {historyState[s.id].error}
+                              <button
+                                className={styles.retryBtn}
+                                onClick={() => handleRowClick(s.id)}
+                              >
+                                Retry
+                              </button>
+                            </div>
+                          ) : history[s.id]?.length > 0 ? (
+                            <div className={styles.historyTableWrapper}>
+                              <table className={styles.historyTable}>
+                                <thead>
+                                  <tr>
+                                    <th className={styles.colName}>ACTIVITY NAME</th>
+                                    <th className={styles.colLevel}>LEVEL</th>
+                                    <th className={styles.colPoints}>POINTS</th>
+                                    <th className={styles.colStatus}>STATUS</th>
+                                    <th className={styles.colDate}>DATE</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {history[s.id].map((sub, idx) => (
+                                    <tr key={idx}>
+                                      <td className={styles.histName}>{sub.activityName}</td>
+                                      <td className={styles.histLevel}>
+                                        <span
+                                          className={`${styles.catBadge} ${styles[sub.activityLevel.toLowerCase()] || ''}`}
+                                        >
+                                          {sub.activityLevel}
+                                        </span>
+                                      </td>
+                                      <td className={styles.histPoints}>
+                                        {sub.status === 'Approved'
+                                          ? sub.pointsApproved
+                                          : sub.pointsRequested}
+                                      </td>
+                                      <td className={styles.histStatusCell}>
+                                        <span
+                                          className={`${styles.histStatus} ${styles[sub.status.toLowerCase()] || ''}`}
+                                        >
+                                          {sub.status}
+                                        </span>
+                                      </td>
+                                      <td className={styles.histDate}>
+                                        {new Date(sub.createdAt).toLocaleDateString()}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <p className={styles.noHistory}>
+                              No submission history found for this student.
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))
+            ) : (
               <tr>
-                <td colSpan={6} className={styles.emptyState}>No students found.</td>
+                <td colSpan={7} className={styles.emptyState}>
+                  No students found.
+                </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* ── Pagination ── */}
+      {/* -- Pagination -- */}
       <div className={styles.pagination}>
         <span className={styles.paginationInfo}>
-          Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} students
+          Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–
+          {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} students
         </span>
         <div className={styles.paginationControls}>
           <button
             className={styles.pageBtn}
-            onClick={() => setPage(p => Math.max(1, p - 1))}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
           <button
             className={styles.pageBtn}
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || filtered.length === 0}
           >
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M9 18l6-6-6-6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* ── Mail Modal ── */}
+      {/* -- Mail Modal -- */}
       <MailModal
         isOpen={!!mailTarget}
         onClose={() => setMailTarget(null)}
+        studentId={mailTarget?._id}
         studentName={mailTarget?.name}
+        studentEmail={mailTarget?.email}
       />
-
     </div>
   )
 }

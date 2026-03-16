@@ -35,7 +35,7 @@
   color: var(--amber-dark);
 }
 
-/* ── Search Group ── */
+/* -- Search Group -- */
 .searchGroup {
   display: flex;
   gap: 12px;
@@ -75,7 +75,7 @@
 }
 
 .searchBtn {
-  background: #FFB800;
+  background: #ffb800;
   /* Yellow */
   color: #000;
   border: none;
@@ -88,7 +88,7 @@
 }
 
 .searchBtn:hover {
-  background: #E6A600;
+  background: #e6a600;
   transform: translateY(-1px);
 }
 
@@ -239,7 +239,9 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.18s, transform 0.1s;
+  transition:
+    background 0.18s,
+    transform 0.1s;
 }
 
 .reviewBtn:hover {

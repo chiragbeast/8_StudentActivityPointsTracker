@@ -6,7 +6,7 @@ const SystemConfig = require('../models/SystemConfig');
 // @route   GET /api/notifications
 // @access  Private
 const getNotifications = asyncHandler(async (req, res) => {
-    const notifications = await Notification.find({ recipient: req.user._id })
+    const notifications = await Notification.find({ user: req.user._id })
         .sort({ createdAt: -1 });
     res.status(200).json(notifications);
 });
@@ -16,8 +16,8 @@ const getNotifications = asyncHandler(async (req, res) => {
 // @access  Private
 const markAsRead = asyncHandler(async (req, res) => {
     const notification = await Notification.findOneAndUpdate(
-        { _id: req.params.id, recipient: req.user._id },
-        { isRead: true },
+        { _id: req.params.id, user: req.user._id },
+        { read: true },
         { new: true }
     );
 

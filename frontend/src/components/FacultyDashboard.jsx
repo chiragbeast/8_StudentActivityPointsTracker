@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './FacultySidebar'
 import StatCards from './FacultyStatCards'
 import { Bell, X, Check, Info } from 'lucide-react'
@@ -6,20 +6,69 @@ import PendingSubmissions from './FacultyPendingSubmissions'
 import PendingSubmissionsPage from './FacultyPendingSubmissionsPage'
 import AssignedStudentsPage from './FacultyAssignedStudentsPage'
 import ReviewDetailPage from './FacultyReviewDetailPage'
+import ProfilePage from './FacultyProfilePage'
+import DeadlinesPage from './FacultyDeadlinesPage'
+import { facultyApi, notificationApi } from '../services/api'
 import styles from './FacultyDashboard.module.css'
-
-const notifications = [
-  { id: 1, type: 'success', text: 'Aditi Sharma\'s submission approved', time: '2 mins ago' },
-  { id: 2, type: 'info', text: 'New activity submission from Rahul Verma', time: '1 hour ago' },
-  { id: 3, type: 'info', text: 'Sneha Kapoor updated her profile', time: '3 hours ago' },
-  { id: 4, type: 'success', text: 'Bulk approval of 5 items completed', time: '5 hours ago' },
-  { id: 5, type: 'info', text: 'Reminder: 28 pending reviews remaining', time: '1 day ago' },
-]
 
 export default function Dashboard() {
   const [activeNav, setActiveNav] = useState('Dashboard')
   const [reviewSubmission, setReviewSubmission] = useState(null)
   const [showNotif, setShowNotif] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  const [stats, setStats] = useState({ assignedStudents: 0, pendingReviews: 0 })
+
+  async function fetchNotifications() {
+    try {
+      const res = await notificationApi.getNotifications()
+      setNotifications(res.data)
+    } catch (err) {
+      console.error('Error fetching notifications:', err)
+    }
+  }
+
+  async function fetchStats() {
+    try {
+      const res = await facultyApi.getStats()
+      if (res.data.success) {
+        setStats({
+          assignedStudents: res.data.data.totalAssignedStudents,
+          pendingReviews: res.data.data.pendingSubmissions,
+        })
+      }
+    } catch (err) {
+      console.error('Error fetching faculty stats:', err)
+    }
+  }
+
+  useEffect(() => {
+    const initialFetchTimer = setTimeout(() => {
+      fetchNotifications()
+    }, 0)
+    const interval = setInterval(fetchNotifications, 30000)
+    return () => {
+      clearTimeout(initialFetchTimer)
+      clearInterval(interval)
+    }
+  }, [])
+
+  const handleMarkRead = async (id) => {
+    try {
+      await notificationApi.markAsRead(id)
+      fetchNotifications()
+    } catch (err) {
+      console.error('Error marking notification as read:', err)
+    }
+  }
+
+  useEffect(() => {
+    if (activeNav === 'Dashboard') {
+      const statsFetchTimer = setTimeout(() => {
+        fetchStats()
+      }, 0)
+      return () => clearTimeout(statsFetchTimer)
+    }
+  }, [activeNav])
 
   // Called by any Review button — pass the submission object
   const openReview = (submission) => {
@@ -45,6 +94,10 @@ export default function Dashboard() {
         return <AssignedStudentsPage />
       case 'Pending Submissions':
         return <PendingSubmissionsPage onReview={openReview} />
+      case 'Manage Deadlines':
+        return <DeadlinesPage />
+      case 'Profile':
+        return <ProfilePage />
       case 'Dashboard':
       default:
         return (
@@ -54,7 +107,12 @@ export default function Dashboard() {
               <div className={styles.notifWrapper}>
                 <button className={styles.bell} onClick={() => setShowNotif(!showNotif)}>
                   <Bell size={22} />
-                  <span className={styles.badge}>5</span>
+                  {Array.isArray(notifications) &&
+                    notifications.filter((n) => !n.read).length > 0 && (
+                      <span className={styles.badge}>
+                        {notifications.filter((n) => !n.read).length}
+                      </span>
+                    )}
                 </button>
 
                 {showNotif && (
@@ -66,24 +124,49 @@ export default function Dashboard() {
                       </button>
                     </div>
                     <div className={styles.notifList}>
-                      {notifications.map((n) => (
-                        <div key={n.id} className={styles.notifItem}>
-                          <div className={`${styles.iconCircle} ${styles[n.type]}`}>
-                            {n.type === 'success' ? <Check size={14} /> : <Info size={14} />}
+                      {Array.isArray(notifications) && notifications.length > 0 ? (
+                        notifications.map((n) => (
+                          <div
+                            key={n._id}
+                            className={styles.notifItem}
+                            onClick={() => handleMarkRead(n._id)}
+                          >
+                            <div
+                              className={`${styles.iconCircle} ${styles[n.read ? 'info' : 'success']}`}
+                            >
+                              {n.read ? <Info size={14} /> : <Check size={14} />}
+                            </div>
+                            <div className={styles.notifContent}>
+                              <p
+                                className={styles.notifText}
+                                style={{ fontWeight: n.read ? '400' : '600' }}
+                              >
+                                {n.message}
+                              </p>
+                              <span className={styles.notifTime}>
+                                {new Date(n.createdAt).toLocaleString()}
+                              </span>
+                            </div>
                           </div>
-                          <div className={styles.notifContent}>
-                            <p className={styles.notifText}>{n.text}</p>
-                            <span className={styles.notifTime}>{n.time}</span>
-                          </div>
+                        ))
+                      ) : (
+                        <div
+                          className={styles.emptyNotif || ''}
+                          style={{ padding: '20px', textAlign: 'center', color: '#aaa' }}
+                        >
+                          No new notifications.
                         </div>
-                      ))}
+                      )}
                     </div>
                     <button className={styles.viewAllBtn}>View All Notifications</button>
                   </div>
                 )}
               </div>
             </div>
-            <StatCards assignedStudents={142} pendingReviews={28} />
+            <StatCards
+              assignedStudents={stats.assignedStudents}
+              pendingReviews={stats.pendingReviews}
+            />
             <PendingSubmissions onReviewClick={openReview} />
           </>
         )
@@ -94,9 +177,7 @@ export default function Dashboard() {
     <div className={styles.layout}>
       <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       <div className={styles.main}>
-        <div className={styles.content}>
-          {renderPage()}
-        </div>
+        <div className={styles.content}>{renderPage()}</div>
       </div>
     </div>
   )

@@ -22,6 +22,10 @@ const deadlineSchema = new mongoose.Schema({
         enum: ['Institute', 'Department', 'General'],
         required: [true, 'Category is required'],
     },
+    assignedStudents: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
 
     // ── Visibility ──
     visibleToRoles: {
