@@ -299,8 +299,69 @@ const EditStudent = () => {
                     </div>
                   </div>
 
+                  <div className="space-y-2">
+                    <label
+                      className="text-xs font-semibold uppercase tracking-wider ml-1"
+                      style={{ color: '#1a1a2e' }}
+                    >
+                      Branch
+                    </label>
+                    <div className="relative">
+                      <span
+                        className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-lg z-10 pointer-events-none"
+                        style={{ color: '#9ca3af' }}
+                      >
+                        account_tree
+                      </span>
+                      <select
+                        className="w-full border rounded-lg py-3 pl-10 pr-10 focus:outline-none focus:ring-1 transition-all font-display appearance-none cursor-pointer"
+                        style={{
+                          backgroundColor: '#fafaf8',
+                          borderColor: '#e5e1d8',
+                          color: '#1a1a2e',
+                        }}
+                        value={form.department}
+                        onChange={(e) => setForm({ ...form, department: e.target.value })}
+                        onFocus={(e) => (e.target.style.borderColor = '#f5a623')}
+                        onBlur={(e) => (e.target.style.borderColor = '#e5e1d8')}
+                      >
+                        <option value="" style={{ color: '#6b7280' }}>
+                          Select Branch
+                        </option>
+                        <option value="Computer Science & Engineering (CSE)">
+                          Computer Science & Engineering (CSE)
+                        </option>
+                        <option value="Electronics & Communication Engineering (ECE)">
+                          Electronics & Communication Engineering (ECE)
+                        </option>
+                        <option value="Electrical & Electronics Engineering (EEE)">
+                          Electrical & Electronics Engineering (EEE)
+                        </option>
+                        <option value="Chemical Engineering (CH)">Chemical Engineering (CH)</option>
+                        <option value="Mechanical Engineering (ME)">
+                          Mechanical Engineering (ME)
+                        </option>
+                        <option value="Civil Engineering (CE)">Civil Engineering (CE)</option>
+                        <option value="Biotechnology (BT)">Biotechnology (BT)</option>
+                        <option value="Materials Science & Engineering (MSE)">
+                          Materials Science & Engineering (MSE)
+                        </option>
+                        <option value="Production Engineering (PE)">
+                          Production Engineering (PE)
+                        </option>
+                        <option value="Engineering Physics (EP)">Engineering Physics (EP)</option>
+                      </select>
+                      <span
+                        className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-lg pointer-events-none"
+                        style={{ color: '#9ca3af' }}
+                      >
+                        expand_more
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Mobile Number */}
-                  <div className="space-y-2 md:col-span-2">
+                  <div className="space-y-2">
                     <label
                       className="text-xs font-semibold uppercase tracking-wider ml-1"
                       style={{ color: '#1a1a2e' }}
