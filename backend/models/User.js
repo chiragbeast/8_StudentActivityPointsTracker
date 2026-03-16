@@ -79,6 +79,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    batchNotifications: {
+        type: Boolean,
+        default: false,
+    },
 
     // ── Security (FR-1.6, NFR-2.8) ──
     failedLoginAttempts: {

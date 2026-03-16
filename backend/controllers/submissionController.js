@@ -1,6 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const Submission = require('../models/Submission');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 const ActivityPoints = require('../models/ActivityPoints');
+const { sendEmail } = require('../utils/mailer');
 const cloudinary = require('../config/cloudinary');
 const { Readable } = require('stream');
 
@@ -82,6 +85,30 @@ const createSubmission = asyncHandler(async (req, res) => {
 
     const submission = await Submission.create(submissionData);
 
+    if (status === 'Pending') {
+        const student = await User.findById(req.user._id);
+        if (student && student.facultyAdvisor) {
+            await Notification.create({
+                user: student.facultyAdvisor,
+                type: 'new_submission',
+                title: 'New Submission for Review',
+                message: `${student.name} has submitted a new activity: ${activityName}`,
+                sender: student.name,
+                senderRole: 'Student',
+                relatedSubmission: submission._id,
+            });
+
+            const facultyAdvisor = await User.findById(student.facultyAdvisor);
+            if (facultyAdvisor && facultyAdvisor.emailNotifications) {
+                await sendEmail({
+                    to: facultyAdvisor.email,
+                    subject: 'New Submission for Review',
+                    text: `${student.name} has submitted a new activity: ${activityName}`,
+                });
+            }
+        }
+    }
+
     res.status(201).json(submission);
 });
 
@@ -162,6 +189,21 @@ const updateSubmission = asyncHandler(async (req, res) => {
     }
 
     const updatedSubmission = await submission.save();
+
+    if (submission.status === 'Pending') {
+        const student = await User.findById(req.user._id);
+        if (student && student.facultyAdvisor) {
+            await Notification.create({
+                user: student.facultyAdvisor,
+                type: 'new_submission',
+                title: 'Submission Resubmitted',
+                message: `${student.name} has updated/resubmitted: ${submission.activityName}`,
+                sender: student.name,
+                senderRole: 'Student',
+                relatedSubmission: updatedSubmission._id,
+            });
+        }
+    }
 
     res.status(200).json(updatedSubmission);
 });

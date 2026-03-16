@@ -14,6 +14,7 @@ export const facultyApi = {
   bulkReviewSubmissions: (data) => api.post('/faculty/submissions/bulk-review', data),
   getStats: () => api.get('/faculty/stats'),
   getProfile: () => api.get('/faculty/profile'),
+  updateProfile: (data) => api.put('/faculty/profile', data),
   exportCSV: () => api.get('/faculty/export', { responseType: 'blob' }),
   getStudentHistory: (studentId) => api.get(`/faculty/students/${studentId}/submissions`),
   exportPDF: (studentId) =>
@@ -26,4 +27,5 @@ export const facultyApi = {
 export const notificationApi = {
   getNotifications: () => api.get('/notifications'),
   markAsRead: (id) => api.put(`/notifications/${id}/read`),
+  markAllRead: () => api.put('/notifications/mark-all-read'),
 }

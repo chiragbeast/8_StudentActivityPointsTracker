@@ -1,8 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const ActivityPoints = require('../models/ActivityPoints');
 const Submission = require('../models/Submission');
+const Notification = require('../models/Notification');
 const Deadline = require('../models/Deadline');
 const User = require('../models/User');
+const { sendEmail } = require('../utils/mailer');
 
 // @desc    Get student dashboard data (points, recent submissions, deadlines)
 // @route   GET /api/student/dashboard
@@ -24,6 +26,8 @@ const getDashboard = asyncHandler(async (req, res) => {
 
     // Fetch active deadlines relevant to the student
     const currentDate = new Date();
+    const threeDaysFromNow = new Date();
+    threeDaysFromNow.setDate(currentDate.getDate() + 3);
     const activeDeadlines = await Deadline.find({
         isActive: true,
         date: { $gte: currentDate },
@@ -33,6 +37,37 @@ const getDashboard = asyncHandler(async (req, res) => {
             { department: null }
         ]
     }).sort({ date: 1 }).limit(5);
+
+    for (const deadline of activeDeadlines) {
+        if (deadline.date <= threeDaysFromNow) {
+            const title = deadline.title || 'Upcoming Deadline';
+            const lastAlert = await Notification.findOne({
+                user: studentId,
+                type: 'deadline_approaching',
+                title: `Deadline Approaching: ${title}`,
+                createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+            });
+
+            if (!lastAlert) {
+                await Notification.create({
+                    user: studentId,
+                    type: 'deadline_approaching',
+                    title: `Deadline Approaching: ${title}`,
+                    message: `The deadline for "${title}" is on ${deadline.date.toLocaleDateString()}. Please ensure your submissions are complete.`,
+                    senderRole: 'System',
+                });
+
+                const user = await User.findById(studentId);
+                if (user && user.emailNotifications) {
+                    await sendEmail({
+                        to: user.email,
+                        subject: `Deadline Approaching: ${title}`,
+                        text: `The deadline for "${title}" is on ${deadline.date.toLocaleDateString()}.`,
+                    });
+                }
+            }
+        }
+    }
 
     res.status(200).json({
         points,
@@ -61,6 +96,32 @@ const getProfile = asyncHandler(async (req, res) => {
             facultyAdvisor: user.facultyAdvisor,
             notificationsEnabled: user.notificationsEnabled,
             emailNotifications: user.emailNotifications,
+            batchNotifications: user.batchNotifications,
+        });
+    } else {
+        res.status(404);
+        throw new Error('User not found');
+    }
+});
+
+// @desc    Update student profile preferences
+// @route   PUT /api/student/profile
+// @access  Private/Student
+const updateProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        const { notificationsEnabled, emailNotifications, batchNotifications } = req.body;
+
+        if (notificationsEnabled !== undefined) user.notificationsEnabled = notificationsEnabled;
+        if (emailNotifications !== undefined) user.emailNotifications = emailNotifications;
+        if (batchNotifications !== undefined) user.batchNotifications = batchNotifications;
+
+        const updatedUser = await user.save();
+        res.status(200).json({
+            notificationsEnabled: updatedUser.notificationsEnabled,
+            emailNotifications: updatedUser.emailNotifications,
+            batchNotifications: updatedUser.batchNotifications,
         });
     } else {
         res.status(404);
@@ -71,4 +132,5 @@ const getProfile = asyncHandler(async (req, res) => {
 module.exports = {
     getDashboard,
     getProfile,
+    updateProfile,
 };

@@ -17,6 +17,7 @@ const notificationSchema = new mongoose.Schema({
             'submission_modified',    // FR-2.5: Points modified
             'submission_returned',    // FR-3.5: Returned for corrections
             'deadline_approaching',   // FR-5.5: Deadline reminder
+            'deadline_alert',
             'new_submission',         // FR-5.6: For FAs — new pending review
             'system_announcement',    // FR-4.10: Admin announcements
             'account_update',         // Account-related notifications
@@ -34,6 +35,16 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Notification message is required'],
         maxlength: 500,
+    },
+    sender: {
+        type: String,
+        default: 'System',
+        trim: true,
+    },
+    senderRole: {
+        type: String,
+        default: 'System',
+        trim: true,
     },
 
     // ── Related Entity ──

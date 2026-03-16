@@ -2,6 +2,8 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const Submission = require('../models/Submission');
 const ActivityPoints = require('../models/ActivityPoints');
+const Notification = require('../models/Notification');
+const { sendEmail } = require('../utils/mailer');
 
 // ── Helper: Get all student IDs assigned to this faculty ──
 async function getAssignedStudentIds(facultyId) {
@@ -168,6 +170,30 @@ const reviewSubmission = asyncHandler(async (req, res) => {
 
     await submission.save();
 
+    const typeMap = {
+        Approved: 'submission_approved',
+        Denied: 'submission_denied',
+        Returned: 'submission_returned',
+    };
+
+    await Notification.create({
+        user: submission.student,
+        type: typeMap[status] || 'info',
+        title: `Submission ${status}`,
+        message: `Your submission for "${submission.activityName}" has been ${status.toLowerCase()}. ${reviewComments ? `Comment: ${reviewComments}` : ''}`,
+        sender: req.user.name,
+        senderRole: 'Faculty',
+        relatedSubmission: submission._id,
+    });
+
+    if (student.emailNotifications) {
+        await sendEmail({
+            to: student.email,
+            subject: `Submission ${status}: ${submission.activityName}`,
+            text: `Your submission for "${submission.activityName}" has been ${status.toLowerCase()}.`,
+        });
+    }
+
     res.json({
         success: true,
         data: submission,
@@ -251,6 +277,23 @@ const bulkReviewSubmissions = asyncHandler(async (req, res) => {
             }
 
             await submission.save();
+
+            const typeMap = {
+                Approved: 'submission_approved',
+                Denied: 'submission_denied',
+                Returned: 'submission_returned',
+            };
+
+            await Notification.create({
+                user: submission.student,
+                type: typeMap[status] || 'info',
+                title: `Submission ${status} (Bulk Review)`,
+                message: `Your submission for "${submission.activityName}" has been ${status.toLowerCase()} during bulk review.`,
+                sender: req.user.name,
+                senderRole: 'Faculty',
+                relatedSubmission: submission._id,
+            });
+
             results.processed++;
         } catch (err) {
             results.errors.push({ id, error: err.message });
@@ -309,6 +352,34 @@ const getFacultyProfile = asyncHandler(async (req, res) => {
         success: true,
         data: faculty,
     });
+});
+
+// @desc    Update faculty profile preferences
+// @route   PUT /api/faculty/profile
+// @access  Private/Faculty
+const updateFacultyProfile = asyncHandler(async (req, res) => {
+    const faculty = await User.findById(req.user._id);
+
+    if (faculty) {
+        const { notificationsEnabled, emailNotifications, batchNotifications } = req.body;
+
+        if (notificationsEnabled !== undefined) faculty.notificationsEnabled = notificationsEnabled;
+        if (emailNotifications !== undefined) faculty.emailNotifications = emailNotifications;
+        if (batchNotifications !== undefined) faculty.batchNotifications = batchNotifications;
+
+        const updatedFaculty = await faculty.save();
+        res.status(200).json({
+            success: true,
+            data: {
+                notificationsEnabled: updatedFaculty.notificationsEnabled,
+                emailNotifications: updatedFaculty.emailNotifications,
+                batchNotifications: updatedFaculty.batchNotifications,
+            },
+        });
+    } else {
+        res.status(404);
+        throw new Error('Faculty not found');
+    }
 });
 
 // @desc    Get submissions history for a specific student
@@ -535,6 +606,7 @@ module.exports = {
     bulkReviewSubmissions,
     exportStudentsCSV,
     getFacultyProfile,
+    updateFacultyProfile,
     getStudentSubmissions,
     exportStudentPDF,
     exportAllPDFs,

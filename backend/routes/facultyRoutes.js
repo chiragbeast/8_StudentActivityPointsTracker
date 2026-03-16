@@ -9,6 +9,7 @@ const {
     bulkReviewSubmissions,
     exportStudentsCSV,
     getFacultyProfile,
+    updateFacultyProfile,
     getStudentSubmissions,
     exportStudentPDF,
     exportAllPDFs,
@@ -34,7 +35,9 @@ router.get('/students/export-all-pdf', exportAllPDFs);
 router.get('/students/:studentId/submissions', getStudentSubmissions);
 router.get('/students/:studentId/export-pdf', exportStudentPDF);
 router.get('/export', exportStudentsCSV);
-router.get('/profile', getFacultyProfile);
+router.route('/profile')
+    .get(getFacultyProfile)
+    .put(updateFacultyProfile);
 router.post('/students/:studentId/notify-email', notifyStudentOfEmail);
 
 module.exports = router;
