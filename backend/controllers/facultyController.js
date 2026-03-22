@@ -759,8 +759,9 @@ const exportAllExcel = asyncHandler(async (req, res) => {
 
     for (let i = 0; i < students.length; i++) {
         const student = students[i];
-        const studentNameClean = student.name.replace(/[*?:\\/|[\]]/g, '').substring(0, 30); // Excel sheet name limit
-        const sheet = workbook.addWorksheet(studentNameClean || `Student ${i+1}`);
+        // Sheet names must be unique and <= 31 characters. Roll number is usually unique.
+        const sheetName = `${student.rollNumber || student.name || 'Student'}_${i+1}`.substring(0, 31);
+        const sheet = workbook.addWorksheet(sheetName);
 
         // Fetch data for this student
         const pointsRecord = await ActivityPoints.findOne({ student: student._id });
