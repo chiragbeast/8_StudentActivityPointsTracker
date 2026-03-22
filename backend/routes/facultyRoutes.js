@@ -19,8 +19,6 @@ const {
 const { protect, role } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
-console.log('--- Faculty Routes Loading ---');
-
 // All routes require Faculty role
 router.use(protect, role('Faculty'));
 
