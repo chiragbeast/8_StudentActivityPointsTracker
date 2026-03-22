@@ -17,7 +17,7 @@ const AdminUserManagement = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showTranscriptModal, setShowTranscriptModal] = useState(false)
-  const [selectedSemester, setSelectedSemester] = useState('')
+  const [selectedYear, setSelectedYear] = useState('')
   const [selectedBranch, setSelectedBranch] = useState('')
   const [transcriptError, setTranscriptError] = useState('')
   const [transcriptDownloading, setTranscriptDownloading] = useState(false)
@@ -212,21 +212,21 @@ const AdminUserManagement = () => {
     )
   })
 
-  const semesterOptions = ['1', '2', '3', '4', '5', '6', '7', '8']
+  const yearOptions = ['1', '2', '3', '4']
   const branchOptions = [
     ...new Set(students.map((s) => (s.department || '').trim()).filter(Boolean)),
   ].sort((a, b) => a.localeCompare(b))
 
   const resetTranscriptModal = () => {
     setShowTranscriptModal(false)
-    setSelectedSemester('')
+    setSelectedYear('')
     setSelectedBranch('')
     setTranscriptError('')
     setTranscriptDownloading(false)
   }
 
   const handleDownloadTranscript = async () => {
-    if (!selectedSemester || !selectedBranch) return
+    if (!selectedYear || !selectedBranch) return
 
     try {
       setTranscriptDownloading(true)
@@ -234,7 +234,7 @@ const AdminUserManagement = () => {
 
       const { data } = await api.get('/admin/students/transcript', {
         params: {
-          semester: selectedSemester,
+          year: selectedYear,
           branch: selectedBranch,
         },
       })
@@ -247,11 +247,12 @@ const AdminUserManagement = () => {
         return {
           'S.No.': index + 1,
           'Full Name': student.name || '',
+          'Email Address': student.email || '',
           'Roll Number': student.rollNumber || '',
-          Batch: student.batch || '',
-          Semester: student.semester || selectedSemester,
-          Branch: student.branch || selectedBranch,
           'Mobile Number': student.phone || '',
+          Branch: student.branch || selectedBranch,
+          Semester: student.semester || '',
+          Batch: student.batch || '',
           'Institute points': institutePoints,
           'Department points': departmentPoints,
           'Total points':
@@ -266,11 +267,12 @@ const AdminUserManagement = () => {
       const headers = [
         'S.No.',
         'Full Name',
+        'Email Address',
         'Roll Number',
-        'Batch',
-        'Semester',
-        'Branch',
         'Mobile Number',
+        'Branch',
+        'Semester',
+        'Batch',
         'Institute points',
         'Department points',
         'Total points',
@@ -283,7 +285,7 @@ const AdminUserManagement = () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Transcript')
 
       const safeBranch = selectedBranch.replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, '_')
-      XLSX.writeFile(workbook, `student_transcript_sem${selectedSemester}_${safeBranch}.xlsx`)
+      XLSX.writeFile(workbook, `student_transcript_year${selectedYear}_${safeBranch}.xlsx`)
 
       resetTranscriptModal()
     } catch (err) {
@@ -826,16 +828,16 @@ const AdminUserManagement = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
               <div>
-                <label className="block text-sm font-semibold text-[#111827] mb-2">Semester</label>
+                <label className="block text-sm font-semibold text-[#111827] mb-2">Year</label>
                 <select
-                  value={selectedSemester}
-                  onChange={(e) => setSelectedSemester(e.target.value)}
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#F4AD39]"
                 >
-                  <option value="">Select Semester</option>
-                  {semesterOptions.map((semester) => (
-                    <option key={semester} value={semester}>
-                      {semester}
+                  <option value="">Select Year</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      Year {year}
                     </option>
                   ))}
                 </select>
@@ -875,15 +877,15 @@ const AdminUserManagement = () => {
               <button
                 type="button"
                 onClick={handleDownloadTranscript}
-                disabled={!selectedSemester || !selectedBranch || transcriptDownloading}
+                disabled={!selectedYear || !selectedBranch || transcriptDownloading}
                 className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition-all"
                 style={{
                   backgroundColor:
-                    !selectedSemester || !selectedBranch || transcriptDownloading
+                    !selectedYear || !selectedBranch || transcriptDownloading
                       ? '#9ca3af'
                       : '#F4AD39',
                   cursor:
-                    !selectedSemester || !selectedBranch || transcriptDownloading
+                    !selectedYear || !selectedBranch || transcriptDownloading
                       ? 'not-allowed'
                       : 'pointer',
                   opacity: transcriptDownloading ? 0.8 : 1,
