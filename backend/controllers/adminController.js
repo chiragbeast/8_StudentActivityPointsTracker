@@ -183,23 +183,37 @@ const getStudents = asyncHandler(async (req, res) => {
     res.status(200).json(students);
 });
 
-// @desc    Get transcript export data filtered by semester and branch
+// @desc    Get transcript export data filtered by year and branch
 // @route   GET /api/admin/students/transcript
 // @access  Private/Admin
 const getStudentTranscriptData = asyncHandler(async (req, res) => {
-    const semester = String(req.query.semester || '').trim();
+    const year = String(req.query.year || '').trim();
     const branch = String(req.query.branch || '').trim();
 
-    if (!semester || !branch) {
+    const yearToSemesters = {
+        '1': ['1', '2'],
+        '2': ['3', '4'],
+        '3': ['5', '6'],
+        '4': ['7', '8'],
+    };
+
+    const semestersForYear = yearToSemesters[year] || [];
+
+    if (!year || !branch) {
         res.status(400);
-        throw new Error('Semester and branch are required');
+        throw new Error('Year and branch are required');
+    }
+
+    if (semestersForYear.length === 0) {
+        res.status(400);
+        throw new Error('Year must be between 1 and 4');
     }
 
     const students = await User.aggregate([
         {
             $match: {
                 role: 'Student',
-                semester,
+                semester: { $in: semestersForYear },
                 department: branch,
             },
         },
@@ -231,6 +245,7 @@ const getStudentTranscriptData = asyncHandler(async (req, res) => {
         {
             $project: {
                 name: 1,
+                email: 1,
                 rollNumber: 1,
                 batch: 1,
                 semester: 1,
@@ -247,7 +262,7 @@ const getStudentTranscriptData = asyncHandler(async (req, res) => {
     ]);
 
     res.status(200).json({
-        semester,
+        year,
         branch,
         count: students.length,
         students,
