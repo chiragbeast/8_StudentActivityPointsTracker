@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import NotificationCenter from './NotificationCenter'
 import NotificationPanel from './NotificationPanel'
+import api from '../api'
 import './DashboardLayout.css'
 
 export default function DashboardLayout() {
@@ -13,6 +14,7 @@ export default function DashboardLayout() {
   const [showNotifications, setShowNotifications] = useState(false)
   const [showMobileNotifPanel, setShowMobileNotifPanel] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -23,6 +25,31 @@ export default function DashboardLayout() {
 
     document.addEventListener('mousedown', handleOutsideClick)
     return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await api.get('notifications')
+        if (!isMounted || !Array.isArray(res.data)) return
+        const unread = res.data.filter((n) => !n.read).length
+        setUnreadCount(unread)
+      } catch {
+        if (isMounted) {
+          setUnreadCount(0)
+        }
+      }
+    }
+
+    fetchUnreadCount()
+    const interval = setInterval(fetchUnreadCount, 10000)
+
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
   }, [])
 
   const currentUser = useMemo(() => {
@@ -113,6 +140,7 @@ export default function DashboardLayout() {
                 />
                 <path d="M9.5 17a2.5 2.5 0 005 0" strokeLinecap="round" />
               </svg>
+              {unreadCount > 0 && <span className="mobile-nav-notif-badge">{unreadCount}</span>}
             </button>
 
             {showMobileNotifPanel && (
