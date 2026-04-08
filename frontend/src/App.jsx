@@ -10,7 +10,6 @@ import ProfilePage from './components/ProfilePage'
 import RegisterPage from './components/RegisterPage'
 
 // Admin components
-import AdminLoginPage from './components/AdminLoginPage'
 import MFAPage from './components/MFAPage'
 import AdminDashboard from './components/AdminDashboard'
 import AdminUserManagement from './components/AdminUserManagement'
@@ -36,7 +35,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/mfa" element={<MFAPage />} />
-        <Route path="/admin-login" element={<AdminLoginPage />} />
+
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Student routes (with sidebar layout) */}

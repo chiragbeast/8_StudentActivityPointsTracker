@@ -117,18 +117,6 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (user && (await bcrypt.compare(password, user.password))) {
-        // Student logs in directly. Faculty/Admin must complete OTP verification.
-        if (user.role === 'Faculty' || user.role === 'Admin') {
-            const otpCode = await setOtpForUser(user);
-            await sendOtpEmail(user.email, otpCode);
-
-            return res.status(200).json({
-                requires2FA: true,
-                email: user.email,
-                role: user.role,
-                message: 'Verification code sent to your email',
-            });
-        }
 
         user.lastLogin = new Date();
         await user.save();
