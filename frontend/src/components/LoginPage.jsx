@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { FaGoogle } from 'react-icons/fa'
+import { GoogleLogin } from '@react-oauth/google'
 import api from '../api'
 import './LoginPage.css'
 
@@ -10,7 +11,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const hiddenGoogleButtonRef = useRef(null)
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+  const completeLogin = (data) => {
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data))
+
+    const role = data.role
+    if (role === 'Admin') {
+      navigate('/admin_dashboard')
+    } else if (role === 'Faculty') {
+      navigate('/faculty_dashboard')
+    } else {
+      navigate('/dashboard')
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -30,21 +46,39 @@ export default function LoginPage() {
         return
       }
 
-      // Store token and user data
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data))
-
-      // Navigate based on role returned from API
-      const role = response.data.role
-      if (role === 'Admin') {
-        navigate('/admin_dashboard')
-      } else if (role === 'Faculty') {
-        navigate('/faculty_dashboard')
-      } else {
-        navigate('/dashboard')
-      }
+      completeLogin(response.data)
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to login')
+    }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    const idToken = credentialResponse?.credential
+    if (!idToken) {
+      setError('Google login failed. Please try again.')
+      return
+    }
+
+    try {
+      setError('')
+      const response = await api.post('/auth/google-login', { idToken })
+      completeLogin(response.data)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Google login failed')
+    }
+  }
+
+  const handleGoogleButtonClick = () => {
+    if (!googleClientId) {
+      setError('Google sign in is not configured on this device yet.')
+      return
+    }
+
+    const googleButton = hiddenGoogleButtonRef.current?.querySelector('div[role="button"]')
+    if (googleButton) {
+      googleButton.click()
+    } else {
+      setError('Google sign in is still loading. Please try again in a second.')
     }
   }
 
@@ -102,15 +136,30 @@ export default function LoginPage() {
               type="button"
               className="google-placeholder-btn"
               data-testid="google-login-placeholder"
-              onClick={() => {
-                if (!googleClientId) {
-                  setError('Google sign in is not configured on this device yet.')
-                }
-              }}
+              onClick={handleGoogleButtonClick}
             >
               <FaGoogle className="google-icon" aria-hidden="true" />
               Continue with Google
             </button>
+
+            {googleClientId ? (
+              <div
+                ref={hiddenGoogleButtonRef}
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  width: 1,
+                  height: 1,
+                  overflow: 'hidden',
+                  opacity: 0,
+                }}
+              >
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setError('Google login failed')}
+                />
+              </div>
+            ) : null}
 
             <Link to="/forgot-password" className="forgot-password-link">
               Forgot Password?
