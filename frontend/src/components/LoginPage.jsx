@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { HiOutlineMail } from 'react-icons/hi'
 import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
 import { GoogleLogin } from '@react-oauth/google'
@@ -138,9 +138,9 @@ export default function LoginPage() {
               </button>
             </div>
             <div className="forgot-row">
-              <a href="#" className="forgot-link">
+              <Link to="/forgot-password" className="forgot-link">
                 Forgot Password?
-              </a>
+              </Link>
             </div>
           </div>
 
