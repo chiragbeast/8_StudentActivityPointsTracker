@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { HiOutlineMail } from 'react-icons/hi'
-import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
-import { GoogleLogin } from '@react-oauth/google'
+import { FaGoogle } from 'react-icons/fa'
 import api from '../api'
 import './LoginPage.css'
 
@@ -50,121 +48,75 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    const idToken = credentialResponse?.credential
-    if (!idToken) {
-      setError('Google login failed. Please try again.')
-      return
-    }
-
-    try {
-      setError('')
-      const response = await api.post('/auth/google-login', { idToken })
-
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data))
-
-      const role = response.data.role
-      if (role === 'Admin') {
-        navigate('/admin_dashboard')
-      } else if (role === 'Faculty') {
-        navigate('/faculty_dashboard')
-      } else {
-        navigate('/dashboard')
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Google login failed')
-    }
-  }
-
   return (
     <div className="login-page">
-      {/* Main content */}
       <main className="login-content">
-        <h1 className="login-title">Welcome Back</h1>
-        <p className="login-subtitle">Enter your email and password to continue.</p>
+        <section className="signin-card">
+          <h1 className="login-title">Sign in.</h1>
+          <p className="login-subtitle">Hey, Enter your details to sign in to your account</p>
 
-        {error && (
-          <div
-            className="error-message"
-            style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}
-          >
-            {error}
-          </div>
-        )}
+          {error && <div className="error-message">{error}</div>}
 
-        {/* Form */}
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
-            <div className="input-wrapper">
-              <HiOutlineMail className="input-icon" />
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group">
               <input
                 id="email"
                 data-testid="login-email"
                 type="text"
                 className="form-input"
-                placeholder="Enter your ID or Email"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <div className="input-wrapper">
-              <FiLock className="input-icon" />
-              <input
-                id="password"
-                data-testid="login-password"
-                type={showPassword ? 'text' : 'password'}
-                className="form-input"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
-              </button>
-            </div>
-            <div className="forgot-row">
-              <a href="#" className="forgot-link">
-                Forgot Password?
-              </a>
-            </div>
-          </div>
-
-          <button type="submit" className="login-btn" data-testid="login-submit">
-            Login
-          </button>
-
-          {googleClientId ? (
-            <div className="oauth-section" data-testid="google-login-section">
-              <div className="oauth-divider">
-                <span>or continue with</span>
-              </div>
-              <div className="google-login-btn-wrap">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => setError('Google login failed')}
-                  width="400"
-                  text="continue_with"
-                  shape="pill"
+            <div className="form-group">
+              <div className="password-field">
+                <input
+                  id="password"
+                  data-testid="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  className="password-input"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  className="toggle-password-text"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
               </div>
             </div>
-          ) : null}
-        </form>
+
+            <button type="submit" className="login-btn" data-testid="login-submit">
+              Sign in
+            </button>
+
+            <p className="or-text">or</p>
+
+            <button
+              type="button"
+              className="google-placeholder-btn"
+              data-testid="google-login-placeholder"
+              onClick={() => {
+                if (!googleClientId) {
+                  setError('Google sign in is not configured on this device yet.')
+                }
+              }}
+            >
+              <FaGoogle className="google-icon" aria-hidden="true" />
+              Continue with Google
+            </button>
+
+            <a href="#" className="forgot-password-link">
+              Forgot Password?
+            </a>
+          </form>
+        </section>
       </main>
     </div>
   )
