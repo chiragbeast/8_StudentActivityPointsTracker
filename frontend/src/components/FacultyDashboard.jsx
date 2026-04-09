@@ -65,6 +65,15 @@ export default function Dashboard() {
     }
   }
 
+  const handleMarkAllRead = async () => {
+    try {
+      await notificationApi.markAllRead()
+      fetchNotifications()
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err)
+    }
+  }
+
   useEffect(() => {
     if (activeNav === 'Dashboard') {
       const statsFetchTimer = setTimeout(() => {
@@ -119,7 +128,27 @@ export default function Dashboard() {
                 {showNotif && (
                   <div className={styles.dropdown}>
                     <div className={styles.dropdownHeader}>
-                      <h3>Notifications</h3>
+                      <div>
+                        <h3>Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button
+                            className={styles.markAllLink}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#f5a623',
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              padding: '0',
+                              marginTop: '2px',
+                            }}
+                            onClick={handleMarkAllRead}
+                          >
+                            Mark all as read
+                          </button>
+                        )}
+                      </div>
                       <button className={styles.closeBtn} onClick={() => setShowNotif(false)}>
                         <X size={16} />
                       </button>
@@ -133,9 +162,9 @@ export default function Dashboard() {
                             onClick={() => handleMarkRead(n._id)}
                           >
                             <div
-                              className={`${styles.iconCircle} ${styles[n.read ? 'info' : 'success']}`}
+                              className={`${styles.iconCircle} ${styles[n.read ? 'success' : 'info']}`}
                             >
-                              {n.read ? <Info size={14} /> : <Check size={14} />}
+                              {n.read ? <Check size={14} /> : <Info size={14} />}
                             </div>
                             <div className={styles.notifContent}>
                               <p

@@ -205,7 +205,14 @@ export default function NotificationPanel({
                             </span>
                           </div>
                         </div>
-                        {!n.read && <span className="notif-unread-dot" />}
+                        {n.read ? (
+                          <FiCheck
+                            className="notif-read-tick"
+                            style={{ color: '#10b981', marginLeft: 'auto' }}
+                          />
+                        ) : (
+                          <span className="notif-unread-dot" />
+                        )}
                       </div>
                     )
                   })}
