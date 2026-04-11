@@ -36,11 +36,22 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
   }
 
   const handleApprove = async () => {
+    if (approvedPoints === '' || approvedPoints === null || approvedPoints === undefined) {
+      alert('Approved points cannot be empty.')
+      return
+    }
+
+    const points = Number(approvedPoints)
+    if (isNaN(points) || points < 0) {
+      alert('Approved points must be greater than or equal to 0.')
+      return
+    }
+
     try {
       setStatus('approved')
       await facultyApi.reviewSubmission(submission._id, {
         status: 'Approved',
-        pointsApproved: approvedPoints,
+        pointsApproved: points,
         reviewComments: feedback || 'Submission approved.',
       })
       setTimeout(() => onBack(), 1500)
@@ -305,17 +316,13 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
             <div className={styles.evalSection}>
               <label className={styles.evalLabel}>Approved Points</label>
               <div className={styles.pointsInputWrapper}>
-                <select
-                  className={styles.pointsDropdown}
+                <input
+                  type="number"
+                  className={styles.pointsInput}
                   value={approvedPoints}
-                  onChange={(e) => setApprovedPoints(Number(e.target.value))}
-                >
-                  {[...Array((uiData.points || 50) + 1).keys()].map((val) => (
-                    <option key={val} value={val}>
-                      {val}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(e) => setApprovedPoints(e.target.value)}
+                  min="0"
+                />
                 <span className={styles.ptsSuffix}>PTS</span>
               </div>
             </div>
