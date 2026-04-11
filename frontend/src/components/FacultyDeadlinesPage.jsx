@@ -9,6 +9,7 @@ import {
   CheckSquare,
   Square,
   CheckCircle,
+  AlertCircle,
 } from 'lucide-react'
 import styles from './FacultyDeadlinesPage.module.css'
 import { deadlineApi, facultyApi } from '../services/api'
@@ -19,6 +20,7 @@ export default function FacultyDeadlinesPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [errorMsg, setErrorMsg] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   const [formData, setFormData] = useState({
@@ -51,7 +53,7 @@ export default function FacultyDeadlinesPage() {
     e.preventDefault()
 
     if (!formData.assignedStudents || formData.assignedStudents.length === 0) {
-      alert('you need to select students for sending the deadline')
+      setErrorMsg('you need to select students for sending the deadline')
       return
     }
 
@@ -62,7 +64,7 @@ export default function FacultyDeadlinesPage() {
       fetchData()
       setShowSuccess(true)
     } catch {
-      alert('Failed to create deadline')
+      setErrorMsg('Failed to create deadline. Please try again.')
     }
   }
 
@@ -292,6 +294,23 @@ export default function FacultyDeadlinesPage() {
             </p>
             <button className={styles.successCloseBtn} onClick={() => setShowSuccess(false)}>
               Excellent
+            </button>
+          </div>
+        </div>
+      )}
+      {errorMsg && (
+        <div className={styles.successOverlay}>
+          <div className={`${styles.successCard} ${styles.errorCard}`}>
+            <div className={styles.successIconBox}>
+              <AlertCircle size={52} className={styles.errorIcon} />
+            </div>
+            <h2 className={styles.successTitle}>Wait a second!</h2>
+            <p className={styles.successText}>{errorMsg}</p>
+            <button
+              className={`${styles.successCloseBtn} ${styles.errorCloseBtn}`}
+              onClick={() => setErrorMsg(null)}
+            >
+              Got it
             </button>
           </div>
         </div>
