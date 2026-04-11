@@ -38,6 +38,12 @@ export default function FacultyDeadlinesPage() {
 
   const handleCreate = async (e) => {
     e.preventDefault()
+
+    if (!formData.assignedStudents || formData.assignedStudents.length === 0) {
+      alert('you need to select students for sending the deadline')
+      return
+    }
+
     try {
       await deadlineApi.createDeadline(formData)
       setShowModal(false)
