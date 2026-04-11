@@ -323,7 +323,7 @@
   border-color: var(--amber);
 }
 
-.pointsDropdown {
+.pointsInput {
   flex: 1;
   padding: 11px 14px;
   border: none;
@@ -333,17 +333,9 @@
   font-weight: 700;
   color: var(--text-dark);
   background: white;
-  cursor: pointer;
-  appearance: none;
-  /* Remove default arrow for custom look if needed, but keeping for now */
 }
 
-/* For custom arrow if appearance: none is used */
-.pointsInputWrapper {
-  position: relative;
-}
-
-.pointsDropdown:focus {
+.pointsInput:focus {
   background: #fff8ec;
 }
 
