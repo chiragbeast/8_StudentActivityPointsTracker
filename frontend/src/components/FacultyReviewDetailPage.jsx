@@ -314,13 +314,18 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
                 <input
                   type="number"
                   className={styles.pointsInput}
-                  value={approvedPoints}
+                  value={approvedPoints === '' ? 0 : approvedPoints}
                   onChange={(e) => {
                     const val = e.target.value
                     if (val === '') {
-                      setApprovedPoints(0)
+                      setApprovedPoints('')
                     } else {
                       setApprovedPoints(parseInt(val, 10) || 0)
+                    }
+                  }}
+                  onBlur={() => {
+                    if (approvedPoints === '') {
+                      setApprovedPoints(0)
                     }
                   }}
                   min="0"
