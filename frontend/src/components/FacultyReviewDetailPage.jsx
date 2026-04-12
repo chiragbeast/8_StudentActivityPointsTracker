@@ -36,11 +36,22 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
   }
 
   const handleApprove = async () => {
+    if (approvedPoints === '' || approvedPoints === null || approvedPoints === undefined) {
+      alert('Approved points cannot be empty.')
+      return
+    }
+
+    const points = Number(approvedPoints)
+    if (!Number.isFinite(points) || points < 0) {
+      alert('Approved points must be greater than or equal to 0.')
+      return
+    }
+
     try {
       setStatus('approved')
       await facultyApi.reviewSubmission(submission._id, {
         status: 'Approved',
-        pointsApproved: approvedPoints,
+        pointsApproved: points,
         reviewComments: feedback || 'Submission approved.',
       })
       setTimeout(() => onBack(), 1500)
@@ -305,17 +316,14 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
             <div className={styles.evalSection}>
               <label className={styles.evalLabel}>Approved Points</label>
               <div className={styles.pointsInputWrapper}>
-                <select
-                  className={styles.pointsDropdown}
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  className={styles.pointsInput}
                   value={approvedPoints}
-                  onChange={(e) => setApprovedPoints(Number(e.target.value))}
-                >
-                  {[...Array((uiData.points || 50) + 1).keys()].map((val) => (
-                    <option key={val} value={val}>
-                      {val}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(e) => setApprovedPoints(e.target.value)}
+                />
                 <span className={styles.ptsSuffix}>PTS</span>
               </div>
             </div>
@@ -337,21 +345,6 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
                 onClick={handleApprove}
                 disabled={!!status}
               >
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    fill={status === 'approved' ? 'white' : 'rgba(0,0,0,0.15)'}
-                  />
-                  <path
-                    d="M8 12l3 3 5-5"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
                 Approve Submission
               </button>
 
@@ -360,21 +353,6 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
                 onClick={handleReject}
                 disabled={!!status}
               >
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke={status === 'rejected' ? 'white' : '#e05252'}
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M15 9l-6 6M9 9l6 6"
-                    stroke={status === 'rejected' ? 'white' : '#e05252'}
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
                 Reject Submission
               </button>
 
@@ -383,15 +361,6 @@ export default function ReviewDetailPage({ submission: initialSubmission, onBack
                 onClick={handleDownloadGuidelines}
                 disabled={downloadingGuidelines}
               >
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M12 3v11m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
                 {downloadingGuidelines ? 'Downloading...' : 'Download Guidelines'}
               </button>
             </div>
