@@ -3,6 +3,8 @@ const Deadline = require('../models/Deadline');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 
+
+
 // @desc    Create a new deadline and notify students
 // @route   POST /api/deadlines
 // @access  Private/Faculty
@@ -30,6 +32,8 @@ const createDeadline = asyncHandler(async (req, res) => {
             type: 'deadline_approaching',
             title: 'New Deadline Assigned',
             message: `A new deadline has been set: ${description}`,
+            sender: req.user.name,
+            senderRole: 'Faculty',
         }));
         await Notification.insertMany(notifications);
     }
