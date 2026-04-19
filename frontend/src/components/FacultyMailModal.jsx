@@ -66,16 +66,44 @@ export default function MailModal({ isOpen, onClose, studentId, studentName, stu
         `,
       })
       setIsSent(true)
-      setTimeout(() => {
-        onClose()
-        setIsSent(false)
-        setIsSending(false)
-      }, 2000)
+      setIsSending(false)
     } catch (err) {
       console.error('Failed to send mail:', err)
       alert('Failed to send email. Please try again.')
       setIsSending(false)
     }
+  }
+
+  const handleClose = () => {
+    onClose()
+    // Reset state for next time
+    setTimeout(() => {
+      setIsSent(false)
+      setIsSending(false)
+    }, 300)
+  }
+
+  if (isSent) {
+    return (
+      <div className={styles.overlay} onClick={handleClose}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.successView}>
+            <div className={styles.successIconBox}>
+              <div className={styles.confetti}></div>
+              <CheckCircle2 size={64} className={styles.successIcon} />
+            </div>
+            <h3 className={styles.successTitle}>Mail Sent Successfully!</h3>
+            <p className={styles.successText}>
+              Your message to <strong>{studentName}</strong> has been dispatched and a system
+              notification has been sent.
+            </p>
+            <button className={styles.doneBtn} onClick={handleClose}>
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -115,13 +143,8 @@ export default function MailModal({ isOpen, onClose, studentId, studentName, stu
           <button className={styles.cancelBtn} onClick={onClose}>
             Cancel
           </button>
-          <button className={styles.sendBtn} onClick={handleSend} disabled={isSending || isSent}>
-            {isSent ? (
-              <>
-                <CheckCircle2 size={18} />
-                Sent!
-              </>
-            ) : isSending ? (
+          <button className={styles.sendBtn} onClick={handleSend} disabled={isSending}>
+            {isSending ? (
               'Sending...'
             ) : (
               <>
