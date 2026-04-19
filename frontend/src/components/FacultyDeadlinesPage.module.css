@@ -87,9 +87,9 @@
 }
 
 .deleteBtn:hover {
-  color: #ef4444;
+  color: #f5a623;
   background: transparent;
-  border-color: #fca5a5;
+  border-color: #f5a623;
 }
 
 .deadlineTitle {
@@ -726,14 +726,15 @@
 }
 
 .deleteBtn {
-  background: #ef4444 !important;
-  color: white !important;
-  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3) !important;
+  background: #1a1a2e !important;
+  color: #f5a623 !important;
+  border: 1px solid #f5a623 !important;
+  box-shadow: 0 10px 15px -3px rgba(245, 166, 35, 0.2) !important;
 }
 
 .deleteBtn:hover {
-  background: #dc2626 !important;
-  box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.4) !important;
+  background: #252545 !important;
+  box-shadow: 0 15px 20px -5px rgba(245, 166, 35, 0.3) !important;
 }
 
 .modalBtnGroup {
