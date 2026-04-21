@@ -220,13 +220,14 @@ export default function NotificationPanel({
                     className="notif-view-all"
                     style={{
                       width: '100%',
-                      padding: '10px',
+                      padding: '14px',
                       border: 'none',
-                      background: '#f8fafc',
+                      borderTop: '1px solid #e5e1d8',
+                      background: '#fbf6e8',
                       color: '#f5a623',
                       fontWeight: '600',
                       cursor: 'pointer',
-                      fontSize: '0.85rem',
+                      fontSize: '13px',
                     }}
                     onClick={() => {
                       setOpen(false)
